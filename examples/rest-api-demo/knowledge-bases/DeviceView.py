@@ -42,7 +42,7 @@ class DeviceView(tk.Frame):
 
 
 
-        self.datalabel = tk.Label(frame,text="dmo sdf sdfsdf sdf sdfsd dsf")
+        self.datalabel = tk.Label(frame,text="Status")
         self.datalabel.grid( row=6,column=0, sticky=tk.S)
 
         self.frame = frame
@@ -59,9 +59,9 @@ class DeviceView(tk.Frame):
         self.scatter.get_tk_widget().grid( row=4,column=0, sticky=tk.S)
 
 
-        self.scale = tk.Scale(frame, from_=0, to=100, orient=tk.HORIZONTAL)
+        self.scale = tk.Scale(frame, from_=0, to=100, orient=tk.HORIZONTAL,length=200)
         self.scale.grid( row=8,column=0, sticky=tk.S)
-
+        self.scale.bind("<ButtonRelease-1>", self.updateScaleValue)
 
     def RevieveData(self, data):
         print('ddd', type(data['temperature']))
@@ -78,7 +78,8 @@ class DeviceView(tk.Frame):
         self.ax.plot(self.data_x,self.data_y )
         self.scatter.draw()
 
-    
+    def updateScaleValue(self, event):
+        print("scale value: " + str(self.scale.get()))
     def flexible_click(self):
         self.isFlexible = not self.isFlexible
         self.UpdateUI_button_flexible()
