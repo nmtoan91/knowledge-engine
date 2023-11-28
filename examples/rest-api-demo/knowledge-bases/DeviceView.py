@@ -26,7 +26,7 @@ class DeviceView(tk.Frame):
         my_label.img = my_img  
         my_label.grid( row=0,column=0, sticky=tk.N)
 
-        frame_buttons = tk.Frame(frame, bg='cyan', width=100, height=100, pady=10,padx = 20)
+        frame_buttons = tk.Frame(frame, width=100, height=100, pady=10,padx = 20)
         frame_buttons.grid( row=2,column=0, sticky=tk.N)
 
         
@@ -37,13 +37,11 @@ class DeviceView(tk.Frame):
         self.button_operation.pack(side=tk.LEFT)
         self.UpdateUI_button_operation()
 
-        #bluebutton = tk.Button(frame_buttons, text="Blue", fg="blue")
-        #bluebutton.pack(side=tk.LEFT)
 
 
 
-        self.datalabel = tk.Label(frame,text="Status")
-        self.datalabel.grid( row=6,column=0, sticky=tk.S)
+        #self.datalabel = tk.Label(frame,text="Status")
+        #self.datalabel.grid( row=6,column=0, sticky=tk.S)
 
         self.frame = frame
 
@@ -58,9 +56,14 @@ class DeviceView(tk.Frame):
         self.scatter = FigureCanvasTkAgg(self.fig, frame)
         self.scatter.get_tk_widget().grid( row=4,column=0, sticky=tk.S)
 
+        frame_scale = tk.Frame(frame, width=100, height=100, pady=10,padx = 20)
+        frame_scale.grid( row=8,column=0, sticky=tk.N)
 
-        self.scale = tk.Scale(frame, from_=0, to=100, orient=tk.HORIZONTAL,length=200)
-        self.scale.grid( row=8,column=0, sticky=tk.S)
+        scalelabel = tk.Label(frame_scale,text="Limit\nPower")
+        scalelabel.pack(side=tk.LEFT)
+
+        self.scale = tk.Scale(frame_scale, from_=0, to=100, orient=tk.HORIZONTAL,length=200)
+        self.scale.pack(side=tk.LEFT)
         self.scale.bind("<ButtonRelease-1>", self.updateScaleValue)
 
     def RevieveData(self, data):
