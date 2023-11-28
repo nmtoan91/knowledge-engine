@@ -50,9 +50,9 @@ class DeviceView(tk.Frame):
         self.ax = self.fig.add_subplot(111)
         
 
-        x = np.linspace(-1, 1, 50)
-        y = 2*x + 1
-        self.ax.plot(x, y)
+        # x = np.linspace(-1, 1, 50)
+        # y = 2*x + 1
+        # self.ax.plot(x, y)
         self.scatter = FigureCanvasTkAgg(self.fig, frame)
         self.scatter.get_tk_widget().grid( row=4,column=0, sticky=tk.S)
 
@@ -67,9 +67,6 @@ class DeviceView(tk.Frame):
         self.scale.bind("<ButtonRelease-1>", self.updateScaleValue)
 
     def RevieveData(self, data):
-        print('ddd', type(data['temperature']))
-
-
         self.data_x.append(len(self.data_x))
         self.data_y.append(float(data['temperature']))
         if len(self.data_y) > 100: self.data_x.pop(0);self.data_y.pop(0)

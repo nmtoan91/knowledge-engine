@@ -42,6 +42,14 @@ def start_ui_kb(kb_id, kb_name, kb_description, ke_endpoint):
             ?measurement saref:isMeasuredIn saref:TemperatureUnit .
             ?measurement saref:hasValue ?temperature .
             ?measurement saref:hasTimestamp ?timestamp .
+            ?esa rdf:type saref:Device .
+            ?esa saref:isUsedFor ?commodity .
+            ?commodity rdf:type saref:Electricity .
+            ?esa saref:makesMeasurement ?monitoring_of_power_consumption .
+            ?monitoring_of_power_consumption saref:relatesToProperty ?power .
+            ?power rdf:type saref:Power .
+            ?monitoring_of_power_consumption saref:isMeasuredIn ?unit .
+            ?monitoring_of_power_consumption saref:hasValue ?value .
         """,
         "ask-measurements",
         kb_id,
@@ -59,6 +67,14 @@ def start_ui_kb(kb_id, kb_name, kb_description, ke_endpoint):
             ?measurement saref:isMeasuredIn saref:TemperatureUnit .
             ?measurement saref:hasValue ?temperature .
             ?measurement saref:hasTimestamp ?timestamp .
+            ?esa rdf:type saref:Device .
+            ?esa saref:isUsedFor ?commodity .
+            ?commodity rdf:type saref:Electricity .
+            ?esa saref:makesMeasurement ?monitoring_of_power_consumption .
+            ?monitoring_of_power_consumption saref:relatesToProperty ?power .
+            ?power rdf:type saref:Power .
+            ?monitoring_of_power_consumption saref:isMeasuredIn ?unit .
+            ?monitoring_of_power_consumption saref:hasValue ?value .
         """,
         None,
         "react-measurements",
