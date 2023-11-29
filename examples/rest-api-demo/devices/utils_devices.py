@@ -191,7 +191,7 @@ def ask(
         json=query_bindings,
     )
     assert response.ok, response.text
-
+    print("rawdata=",response.text)
     return response.json()["bindingSet"]
 
 
@@ -251,7 +251,7 @@ def start_handle_loop(handlers: dict[str, callable], kb_id: str, ke_endpoint: st
                     "Knowledge-Interaction-Id": ki_id,
                 },
             )
-            assert handle_response.ok
+            assert handle_response.ok, handle_response.text
 
             continue
         elif response.status_code == 202:
