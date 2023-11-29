@@ -3,7 +3,7 @@ import time
 import random
 import logging
 
-from utils import *
+from utils_devices import *
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -67,8 +67,9 @@ if __name__ == "__main__":
     add_sigterm_hook()
 
     start_sensor_kb(
-        "http://example.org/washingmachine/dsf",
+        "http://example.org/washingmachine/mc1",
         "Sensor",
         "A temperature sensor",
-        "http://150.65.230.93:8280/rest/",
+        #"http://150.65.230.93:8280/rest/",
+        "http://localhost:8280/rest/",
     )

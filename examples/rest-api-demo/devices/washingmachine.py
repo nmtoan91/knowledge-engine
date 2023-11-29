@@ -3,7 +3,7 @@ import time
 import random
 import logging
 
-from utils import *
+from utils_devices import *
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -18,11 +18,14 @@ def start_sensor_kb(kb_id, kb_name, kb_description, ke_endpoint):
     register_knowledge_base(kb_id, kb_name, kb_description, ke_endpoint)
     ki_id = register_post_knowledge_interaction(
         """
-            ?sensor rdf:type saref:Sensor .
-            ?measurement saref:measurementMadeBy ?sensor .
-            ?measurement saref:isMeasuredIn saref:TemperatureUnit .
-            ?measurement saref:hasValue ?temperature .
-            ?measurement saref:hasTimestamp ?timestamp .
+            ?esa rdf:type saref:Device .
+            ?esa saref:isUsedFor ?commodity .
+            ?commodity rdf:type saref:Electricity .
+            ?esa saref:makesMeasurement ?monitoring_of_power_consumption .
+            ?monitoring_of_power_consumption saref:relatesToProperty ?power .
+            ?power rdf:type saref:Power .
+            ?monitoring_of_power_consumption saref:isMeasuredIn ?unit .
+            ?monitoring_of_power_consumption saref:hasValue ?value .
         """,
         None,
         "post-measurements",
@@ -43,10 +46,12 @@ def start_sensor_kb(kb_id, kb_name, kb_description, ke_endpoint):
         post(
             [
                 {
-                    "sensor": "<https://example.org/sensor/1>",
-                    "measurement": f"<https://example.org/sensor/1/measurement/{measurement_counter}>",
-                    "temperature": f"{value}",
-                    "timestamp": f'"{now.isoformat()}"',
+                    "esa": "<https://example.org/washingmachine/1>",
+                    "commodity": "<https://example.org/commodity/electric>",
+                    "monitoring_of_power_consumption": f"<https://example.org/sensor/1/measurement/{measurement_counter}>",
+                    "power": f"<https://example.org/power/123>",
+                    "unit": f'"watt"',
+                    "value": f"{value}",
                 }
             ],
             ki_id,
@@ -62,8 +67,8 @@ if __name__ == "__main__":
     add_sigterm_hook()
 
     start_sensor_kb(
-        "http://example.org/sensor",
+        "http://example.org/washingmachine/dsf",
         "Sensor",
         "A temperature sensor",
-        "http://localhost:8280/rest/",
+        "http://150.65.230.93:8280/rest/",
     )

@@ -71,7 +71,7 @@ class DeviceView(tk.Frame):
         self.datasample_count +=1
         self.data_x.append(self.datasample_count)
         self.data_y.append(float(data['temperature']))
-        if len(self.data_y) > 100: self.data_x.pop(0);self.data_y.pop(0)
+        if len(self.data_y) > 50: self.data_x.pop(0);self.data_y.pop(0)
 
         self.UpdateUI_Chart()
 
@@ -81,7 +81,7 @@ class DeviceView(tk.Frame):
         self.data_y.append(float(data['value']))
 
         print("Getting washingmachine data len=", len(self.data_x))
-        if len(self.data_y) > 5: self.data_x.pop(0);self.data_y.pop(0)
+        if len(self.data_y) > 50: self.data_x.pop(0);self.data_y.pop(0)
 
         self.UpdateUI_Chart()
 
