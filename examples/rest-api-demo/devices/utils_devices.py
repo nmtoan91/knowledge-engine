@@ -142,7 +142,7 @@ def register_post_knowledge_interaction(
         json=body,
         headers={"Knowledge-Base-Id": kb_id},
     )
-    assert response.ok
+    assert response.ok, response.text
 
     ki_id = response.json()["knowledgeInteractionId"]
     logger.info(f"received issued knowledge interaction id: {ki_id}")
