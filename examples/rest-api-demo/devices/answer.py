@@ -35,7 +35,8 @@ def handle_react_measurements(bindings):
             bindings,
             KB_DATA,
         )
-    return KB_DATA
+    #bindings[0]['temperature']=-2
+    return [bindings[0],bindings[0]]
 
 
 def start_anwer_kb(kb_id, kb_name, kb_description, ke_endpoint):
