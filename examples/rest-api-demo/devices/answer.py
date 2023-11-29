@@ -27,15 +27,15 @@ def handle_react_measurements(bindings):
 
     KB_DATA = [{
                     "sensor": "<https://example.org/sensor/askingsensor>",
-                    "measurement": f"<https://example.org/sensor/1/measurement/{56789}>",
-                    "temperature": f"{123456}",
+                    "measurement": f"<https://example.org/sensor/1/measurement/{59}>",
+                    "temperature": f"{156}",
                     "timestamp": f'"{datetime.datetime.now().isoformat()}"',
                 }]
     data = match_bindings(
             bindings,
             KB_DATA,
         )
-    return data
+    return KB_DATA
 
 
 def start_anwer_kb(kb_id, kb_name, kb_description, ke_endpoint):

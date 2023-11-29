@@ -65,7 +65,7 @@ def start_anwer_kb(kb_id, kb_name, kb_description, ke_endpoint):
             kb_id,
             ke_endpoint,
         )
-        print(data)
+        print(data,'\n')
 
         time.sleep(2)
 
