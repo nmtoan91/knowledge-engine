@@ -15,16 +15,16 @@ def present_measurement(binding: dict[str, str], historical: bool = False):
         s += f"{key}:{value}  "
     print(s)
 
-    if historical:
-        print(
-            f"[HISTORICAL] Temperature was {binding['temperature']} units at {binding['timestamp'][1:-1]}",
-            flush=True,
-        )
-    else:
-        print(
-            f"[NEW!] ffffff is {binding['temperature']} units at {binding['timestamp'][1:-1]}",
-            flush=True,
-        )
+    # if historical:
+    #     print(
+    #         f"[HISTORICAL] Temperature was {binding['temperature']} units at {binding['timestamp'][1:-1]}",
+    #         flush=True,
+    #     )
+    # else:
+    #     print(
+    #         f"[NEW!] ffffff is {binding['temperature']} units at {binding['timestamp'][1:-1]}",
+    #         flush=True,
+    #     )
     mainView.RevieveData(binding)
 
 
@@ -37,22 +37,6 @@ def handle_react_measurements(bindings):
 def start_ui_kb(kb_id, kb_name, kb_description, ke_endpoint):
     #Sensor
     register_knowledge_base(kb_id, kb_name, kb_description, ke_endpoint)
-    ask_measurements_ki = register_ask_knowledge_interaction(
-        """
-            ?sensor rdf:type saref:Sensor .
-            ?measurement saref:measurementMadeBy ?sensor .
-            ?measurement saref:isMeasuredIn saref:TemperatureUnit .
-            ?measurement saref:hasValue ?temperature .
-            ?measurement saref:hasTimestamp ?timestamp .
-        """,
-        "ask-measurements",
-        kb_id,
-        ke_endpoint,
-        {
-            "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-            "saref": "https://saref.etsi.org/core/",
-        },
-    )
     react_measurements_ki = register_react_knowledge_interaction(
         """
             ?sensor rdf:type saref:Sensor .
@@ -70,11 +54,6 @@ def start_ui_kb(kb_id, kb_name, kb_description, ke_endpoint):
             "saref": "https://saref.etsi.org/core/",
         },
     )
-    
-
-    historical_measurements = ask([{}], ask_measurements_ki, kb_id, ke_endpoint)
-    for measurement in historical_measurements:
-        present_measurement(measurement, historical=True)
 
     # start_handle_loop(
     #     {
@@ -86,28 +65,8 @@ def start_ui_kb(kb_id, kb_name, kb_description, ke_endpoint):
     #return
     #Washing machine
     kb_id2 = kb_id+str(2)
+    #kb_id2 = kb_id
     register_knowledge_base(kb_id2, kb_name, kb_description, ke_endpoint)
-    ask_measurements_ki2 = register_ask_knowledge_interaction(
-        """
-            ?esa rdf:type saref:Device .
-            ?esa saref:isUsedFor ?commodity .
-            ?commodity rdf:type saref:Electricity .
-            ?esa saref:makesMeasurement ?monitoring_of_power_consumption .
-            ?monitoring_of_power_consumption saref:relatesToProperty ?power .
-            ?power rdf:type saref:Power .
-            ?monitoring_of_power_consumption saref:isMeasuredIn ?unit .
-            ?monitoring_of_power_consumption saref:hasValue ?value .
-        """,
-        "ask-measurements",
-        kb_id2,
-        ke_endpoint,
-        {
-            "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-            "saref": "https://saref.etsi.org/core/",
-        },
-    )
-
-
     
     react_measurements_ki2 = register_react_knowledge_interaction(
         """
@@ -130,22 +89,24 @@ def start_ui_kb(kb_id, kb_name, kb_description, ke_endpoint):
         },
     )
 
-
-    
-
-
-    historical_measurements = ask([{}], ask_measurements_ki2, kb_id2, ke_endpoint)
-    for measurement in historical_measurements:
-        present_measurement(measurement, historical=True)
+    my_start_handle_loop(
+        {
+            react_measurements_ki2: handle_react_measurements,
+            react_measurements_ki: handle_react_measurements,
+        },
+        [kb_id,kb_id2],
+        ke_endpoint,
+    )
 
     start_handle_loop(
         {
-            react_measurements_ki: handle_react_measurements,
             react_measurements_ki2: handle_react_measurements,
+            react_measurements_ki: handle_react_measurements,
         },
         kb_id,
         ke_endpoint,
     )
+    #print("\n\n\n\n\n\n CCCCCCCCCCCCCCCCCCCCCCCCC \n\n\n\n")
 
 
 

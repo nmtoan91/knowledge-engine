@@ -20,8 +20,8 @@ class MainView(threading.Thread):
         root.columnconfigure(0, weight=1)
         root.columnconfigure(1, weight=1)
 
-        frame1  = DeviceView(root,"<https://example.org/sensor/1>")
-        frame2  = DeviceView(root,"<http://example.org/washingmachine/mc1>")
+        frame1  = DeviceView(root,"<https://example.org/sensor/1>",iconname="temperature.png")
+        frame2  = DeviceView(root,"<https://example.org/washingmachine/1>",iconname="cleaning.png")
         frame1.frame.grid(row=0, column =0)
         frame2.frame.grid(row=0, column =1)
 
@@ -30,9 +30,16 @@ class MainView(threading.Thread):
 
         root.mainloop()
     def RevieveData(self, data):
-        if data['sensor']  in self.devices:
-            self.devices[data['sensor']].RevieveData(data)
-        else: print("Cannot find view for " + data['sensor'])
+        if 'sensor' in data.keys():
+            if data['sensor']  in self.devices:
+                self.devices[data['sensor']].RevieveData_Sensor(data)
+            else: print("Cannot find view for sensor:" + data['sensor'])
+        elif 'esa' in data.keys():
+            if data['esa']  in self.devices:
+                self.devices[data['esa']].RevieveData_WashingMachine(data)
+            else: print("Cannot find view for esa: " + data['esa'])
+
+        else: print("Cannot find view")
     
 if __name__ == "__main__":
     mainView = MainView("My tkinter thread", 1000) 

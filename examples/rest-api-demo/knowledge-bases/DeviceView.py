@@ -10,7 +10,8 @@ import numpy as np
 class DeviceView(tk.Frame):
     
 
-    def __init__(self,root, id):
+    def __init__(self,root, id,iconname="lightbulb.png"):
+        self.datasample_count =0
         self.id = id
         self.isFlexible = False
         self.isOperation = False
@@ -20,7 +21,7 @@ class DeviceView(tk.Frame):
         frame = tk.Frame(root, bg='lavender', width=300, height=600, pady=10,padx = 10)
         frame.grid_rowconfigure(1, weight=1)
         frame.grid_columnconfigure(0, weight=1)
-        image = Image.open(r"examples/rest-api-demo/knowledge-bases/Images/lightbulb.png").resize((100, 100))
+        image = Image.open(r"examples/rest-api-demo/knowledge-bases/Images/"+iconname).resize((100, 100))
         my_img = ImageTk.PhotoImage(image)
         my_label = tk.Label(frame,image=my_img)  
         my_label.img = my_img  
@@ -66,12 +67,24 @@ class DeviceView(tk.Frame):
         self.scale.pack(side=tk.LEFT)
         self.scale.bind("<ButtonRelease-1>", self.updateScaleValue)
 
-    def RevieveData(self, data):
-        self.data_x.append(len(self.data_x))
+    def RevieveData_Sensor(self, data):
+        self.datasample_count +=1
+        self.data_x.append(self.datasample_count)
         self.data_y.append(float(data['temperature']))
         if len(self.data_y) > 100: self.data_x.pop(0);self.data_y.pop(0)
 
         self.UpdateUI_Chart()
+
+    def RevieveData_WashingMachine(self, data):
+        self.datasample_count +=1
+        self.data_x.append(self.datasample_count)
+        self.data_y.append(float(data['value']))
+
+        print("Getting washingmachine data len=", len(self.data_x))
+        if len(self.data_y) > 5: self.data_x.pop(0);self.data_y.pop(0)
+
+        self.UpdateUI_Chart()
+
 
     def UpdateUI_Chart(self):
         self.ax.clear()

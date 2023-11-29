@@ -61,9 +61,8 @@ def register_knowledge_base(
             "knowledgeBaseDescription": kb_description,
         },
     )
-    if not response.ok:
-        print(response.reason)
-    assert response.ok
+    
+    assert response.ok, response.text
 
     logger.info(f"registered {kb_name}")
 
@@ -269,3 +268,65 @@ def start_handle_loop(handlers: dict[str, callable], kb_id: str, ke_endpoint: st
             continue
 
     logger.info(f"exiting handle loop")
+
+
+
+def my_start_handle_loop(handlers: dict[str, callable], kb_ids: str, ke_endpoint: str):
+    """
+    Start the handle loop, where it will long poll to a route that returns a
+    handle request when it arrives.
+
+    Once a handle request is returns (on status 200) for an ANSWER/REACT, it
+    will be handled by the corresponding knowledge interaction handler given in
+    `handlers` (keyed by the knowledge interaction ID), and the result is passed
+    back to the KE.
+    """
+    while True:
+        for kb_id in kb_ids:
+            response = requests.get(
+                ke_endpoint + "sc/handle", headers={"Knowledge-Base-Id": kb_id}
+            )
+
+            if response.status_code == 200:
+                # 200 means: we receive bindings that we need to handle, then repoll asap.
+                handle_request = response.json()
+
+                ki_id = handle_request["knowledgeInteractionId"]
+                handle_request_id = handle_request["handleRequestId"]
+                bindings = handle_request["bindingSet"]
+
+                assert ki_id in handlers
+                handler = handlers[ki_id]
+
+                # pass the bindings to the handler, and let it handle them
+                result_bindings = handler(bindings)
+
+                handle_response = requests.post(
+                    ke_endpoint + "sc/handle",
+                    json={
+                        "handleRequestId": handle_request_id,
+                        "bindingSet": result_bindings,
+                    },
+                    headers={
+                        "Knowledge-Base-Id": kb_id,
+                        "Knowledge-Interaction-Id": ki_id,
+                    },
+                )
+                assert handle_response.ok
+
+                continue
+            elif response.status_code == 202:
+                # 202 means: repoll (heartbeat)
+                continue
+            elif response.status_code == 410:
+                # 410 means: KE has stopped, so terminate
+                break
+            else:
+                logger.warn(f"received unexpected status {response.status_code}")
+                logger.warn(response.text)
+                logger.info("repolling after a short timeout")
+                time.sleep(2)
+                continue
+
+    logger.info(f"exiting handle loop")
+
