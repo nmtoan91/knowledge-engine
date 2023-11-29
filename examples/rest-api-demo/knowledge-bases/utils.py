@@ -87,7 +87,7 @@ def register_ask_knowledge_interaction(
         json=body,
         headers={"Knowledge-Base-Id": kb_id},
     )
-    assert response.ok
+    assert response.ok, response.text
 
     ki_id = response.json()["knowledgeInteractionId"]
     logger.info(f"received issued knowledge interaction id: {ki_id}")
@@ -191,7 +191,7 @@ def ask(
         headers={"Knowledge-Base-Id": kb_id, "Knowledge-Interaction-Id": ki_id},
         json=query_bindings,
     )
-    assert response.ok
+    assert response.ok, response.text
 
     return response.json()["bindingSet"]
 
