@@ -19,14 +19,11 @@ def start_sensor_kb(kb_id, kb_name, kb_description, ke_endpoint):
     register_knowledge_base(kb_id, kb_name, kb_description, ke_endpoint)
     ki_id = register_post_knowledge_interaction(
         """
-            ?esa rdf:type saref:Device .
-            ?esa saref:isUsedFor ?commodity .
-            ?commodity rdf:type saref:Electricity .
-            ?esa saref:makesMeasurement ?monitoring_of_power_consumption .
-            ?monitoring_of_power_consumption saref:relatesToProperty ?power .
-            ?power rdf:type saref:Power .
-            ?monitoring_of_power_consumption saref:isMeasuredIn ?unit .
-            ?monitoring_of_power_consumption saref:hasValue ?value .
+            ?sensor rdf:type saref:Sensor .
+            ?measurement saref:measurementMadeBy ?sensor .
+            ?measurement saref:isMeasuredIn saref:TemperatureUnit .
+            ?measurement saref:hasValue ?temperature .
+            ?measurement saref:hasTimestamp ?timestamp .
         """,
         None,
         "post-measurements",
@@ -41,11 +38,14 @@ def start_sensor_kb(kb_id, kb_name, kb_description, ke_endpoint):
     register_knowledge_base(kb_id2, kb_name, kb_description, ke_endpoint)
     ki_id2 = register_post_knowledge_interaction(
         """
-            ?sensor rdf:type saref:Sensor .
-            ?measurement saref:measurementMadeBy ?sensor .
-            ?measurement saref:isMeasuredIn saref:TemperatureUnit .
-            ?measurement saref:hasValue ?temperature .
-            ?measurement saref:hasTimestamp ?timestamp .
+            ?esa rdf:type saref:Device .
+            ?esa saref:isUsedFor ?commodity .
+            ?commodity rdf:type saref:Electricity .
+            ?esa saref:makesMeasurement ?monitoring_of_power_consumption .
+            ?monitoring_of_power_consumption saref:relatesToProperty ?power .
+            ?power rdf:type saref:Power .
+            ?monitoring_of_power_consumption saref:isMeasuredIn ?unit .
+            ?monitoring_of_power_consumption saref:hasValue ?value .
         """,
         None,
         "post-measurements",
@@ -68,12 +68,11 @@ def start_sensor_kb(kb_id, kb_name, kb_description, ke_endpoint):
         post(
             [
                 {
-                    "esa": "<https://example.org/washingmachine/1>",
-                    "commodity": "<https://example.org/commodity/electric>",
-                    "monitoring_of_power_consumption": f"<https://example.org/sensor/1/measurement/{measurement_counter}>",
-                    "power": f"<https://example.org/power/123>",
-                    "unit": f'"watt"',
-                    "value": f"{value}",
+                    "sensor": "<https://example.org/sensor/1>",
+                    #"sensor": "<https://example.org/washingmachine/1>",
+                    "measurement": f"<https://example.org/sensor/1/measurement/{measurement_counter}>",
+                    "temperature": f"{value}",
+                    "timestamp": f'"{now.isoformat()}"',
                 }
             ],
             ki_id,
@@ -84,11 +83,12 @@ def start_sensor_kb(kb_id, kb_name, kb_description, ke_endpoint):
         post(
             [
                 {
-                    "sensor": "<https://example.org/sensor/1>",
-                    #"sensor": "<https://example.org/washingmachine/1>",
-                    "measurement": f"<https://example.org/sensor/1/measurement/{measurement_counter}>",
-                    "temperature": f"{value}",
-                    "timestamp": f'"{now.isoformat()}"',
+                    "esa": "<https://example.org/washingmachine/1>",
+                    "commodity": "<https://example.org/commodity/electric>",
+                    "monitoring_of_power_consumption": f"<https://example.org/sensor/1/measurement/{measurement_counter}>",
+                    "power": f"<https://example.org/power/123>",
+                    "unit": f'"watt"',
+                    "value": f"{value}",
                 }
             ],
             ki_id2,

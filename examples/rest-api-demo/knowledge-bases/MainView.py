@@ -21,8 +21,8 @@ class MainView(threading.Thread):
         root.columnconfigure(0, weight=1)
         root.columnconfigure(1, weight=1)
 
-        frame1  = DeviceView(root,"<https://example.org/sensor/1>",DeviceType.TEMPERATURE_SENSOR)
-        frame2  = DeviceView(root,"<https://example.org/washingmachine/1>",DeviceType.WASHING_MACHINE)
+        frame1  = DeviceView(root,"http://example.org/sensor",DeviceType.TEMPERATURE_SENSOR)
+        frame2  = DeviceView(root,"http://example.org/washingmachine/mc1",DeviceType.WASHING_MACHINE)
         frame1.frame.grid(row=0, column =0)
         frame2.frame.grid(row=0, column =1)
 
@@ -30,16 +30,9 @@ class MainView(threading.Thread):
         self.devices[frame2.id] = frame2
 
         root.mainloop()
-    def RevieveData(self, data):
-        if 'sensor' in data.keys():
-            if data['sensor']  in self.devices:
-                self.devices[data['sensor']].RevieveData_Sensor(data)
-            else: print("Cannot find view for sensor:" + data['sensor'])
-        elif 'esa' in data.keys():
-            if data['esa']  in self.devices:
-                self.devices[data['esa']].RevieveData_WashingMachine(data)
-            else: print("Cannot find view for esa: " + data['esa'])
-
+    def RevieveData(self, data,requestingKnowledgeBaseId):
+        if requestingKnowledgeBaseId in self.devices:
+             self.devices[requestingKnowledgeBaseId].RevieveData(data,requestingKnowledgeBaseId)
         else: print("Cannot find view")
     
 if __name__ == "__main__":

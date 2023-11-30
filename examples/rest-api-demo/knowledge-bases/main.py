@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def present_measurement(binding: dict[str, str], historical: bool = False):
+def present_measurement(binding: dict[str, str],requestingKnowledgeBaseId, historical: bool = False):
     s = "data="
     for key, value in binding.items() :
         s += f"{key}:{value}  "
@@ -25,13 +25,13 @@ def present_measurement(binding: dict[str, str], historical: bool = False):
     #         f"[NEW!] ffffff is {binding['temperature']} units at {binding['timestamp'][1:-1]}",
     #         flush=True,
     #     )
-    mainView.RevieveData(binding)
+    mainView.RevieveData(binding,requestingKnowledgeBaseId)
 
 
-def handle_react_measurements(bindings,requesting_kb_id):
-    print("\n\n",requesting_kb_id,"\n\n")
+def handle_react_measurements(bindings,requestingKnowledgeBaseId):
+    print("\n\nDDDDDDDDDDDDDDDDDDDDDDDDDDDD\n",requestingKnowledgeBaseId,"\n",bindings ,"\n\n")
     for binding in bindings:
-        present_measurement(binding)
+        present_measurement(binding,requestingKnowledgeBaseId)
     return []
 
 

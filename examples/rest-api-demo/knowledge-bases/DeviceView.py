@@ -69,7 +69,14 @@ class DeviceView(tk.Frame):
         self.scale.pack(side=tk.LEFT)
         self.scale.bind("<ButtonRelease-1>", self.updateScaleValue)
 
-    def RevieveData_Sensor(self, data):
+    def RevieveData(self,data,requestingKnowledgeBaseId):
+        if self.deviceType == DeviceType.TEMPERATURE_SENSOR:
+            self.RevieveData_Sensor(data,requestingKnowledgeBaseId)
+        elif self.deviceType == DeviceType.WASHING_MACHINE:
+            self.RevieveData_WashingMachine(data,requestingKnowledgeBaseId)
+        else: print("Error here")
+
+    def RevieveData_Sensor(self, data,requestingKnowledgeBaseId):
         self.datasample_count +=1
         self.data_x.append(self.datasample_count)
         self.data_y.append(float(data['temperature']))
@@ -77,7 +84,7 @@ class DeviceView(tk.Frame):
 
         self.UpdateUI_Chart()
 
-    def RevieveData_WashingMachine(self, data):
+    def RevieveData_WashingMachine(self, data,requestingKnowledgeBaseId):
         self.datasample_count +=1
         self.data_x.append(self.datasample_count)
         self.data_y.append(float(data['value']))
