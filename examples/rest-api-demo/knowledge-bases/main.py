@@ -29,7 +29,6 @@ def present_measurement(binding: dict[str, str],requestingKnowledgeBaseId, histo
 
 
 def handle_react_measurements(bindings,requestingKnowledgeBaseId):
-    print("\n\nDDDDDDDDDDDDDDDDDDDDDDDDDDDD\n",requestingKnowledgeBaseId,"\n",bindings ,"\n\n")
     for binding in bindings:
         present_measurement(binding,requestingKnowledgeBaseId)
     return []
