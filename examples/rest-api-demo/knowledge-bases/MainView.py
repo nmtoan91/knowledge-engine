@@ -3,6 +3,7 @@ from tkinter import ttk
 import threading 
 from PIL import Image, ImageTk
 from DeviceView import DeviceView
+from DeviceView import DeviceType
 
 class MainView(threading.Thread):
     def __init__(self, thread_name, thread_ID): 
@@ -20,8 +21,8 @@ class MainView(threading.Thread):
         root.columnconfigure(0, weight=1)
         root.columnconfigure(1, weight=1)
 
-        frame1  = DeviceView(root,"<https://example.org/sensor/1>",iconname="temperature.png")
-        frame2  = DeviceView(root,"<https://example.org/washingmachine/1>",iconname="cleaning.png")
+        frame1  = DeviceView(root,"<https://example.org/sensor/1>",DeviceType.TEMPERATURE_SENSOR)
+        frame2  = DeviceView(root,"<https://example.org/washingmachine/1>",DeviceType.WASHING_MACHINE)
         frame1.frame.grid(row=0, column =0)
         frame2.frame.grid(row=0, column =1)
 

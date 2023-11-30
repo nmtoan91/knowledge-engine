@@ -6,11 +6,23 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
+from enum import Enum
+
+class DeviceType(Enum):
+    UNKNOWN =0
+    TEMPERATURE_SENSOR =1
+    WASHING_MACHINE = 2
 
 class DeviceView(tk.Frame):
     
 
-    def __init__(self,root, id,iconname="lightbulb.png"):
+    def __init__(self,root, id, deviceType: DeviceType):
+        self.deviceType = deviceType
+        if deviceType == DeviceType.WASHING_MACHINE:
+            iconname = "cleaning.png"
+        elif deviceType == DeviceType.TEMPERATURE_SENSOR:
+            iconname = "temperature.png"
+
         self.datasample_count =0
         self.id = id
         self.isFlexible = False
@@ -38,22 +50,12 @@ class DeviceView(tk.Frame):
         self.button_operation.pack(side=tk.LEFT)
         self.UpdateUI_button_operation()
 
-
-
-
-        #self.datalabel = tk.Label(frame,text="Status")
-        #self.datalabel.grid( row=6,column=0, sticky=tk.S)
-
         self.frame = frame
 
         #self.figure = plt.figure(figsize=(2, 2))
         self.fig = plt.figure(figsize=(2, 2))
         self.ax = self.fig.add_subplot(111)
         
-
-        # x = np.linspace(-1, 1, 50)
-        # y = 2*x + 1
-        # self.ax.plot(x, y)
         self.scatter = FigureCanvasTkAgg(self.fig, frame)
         self.scatter.get_tk_widget().grid( row=4,column=0, sticky=tk.S)
 

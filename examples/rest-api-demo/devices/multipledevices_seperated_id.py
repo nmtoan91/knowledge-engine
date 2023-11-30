@@ -85,6 +85,7 @@ def start_sensor_kb(kb_id, kb_name, kb_description, ke_endpoint):
             [
                 {
                     "sensor": "<https://example.org/sensor/1>",
+                    #"sensor": "<https://example.org/washingmachine/1>",
                     "measurement": f"<https://example.org/sensor/1/measurement/{measurement_counter}>",
                     "temperature": f"{value}",
                     "timestamp": f'"{now.isoformat()}"',

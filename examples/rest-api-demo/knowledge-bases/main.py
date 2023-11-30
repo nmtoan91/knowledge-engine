@@ -28,7 +28,8 @@ def present_measurement(binding: dict[str, str], historical: bool = False):
     mainView.RevieveData(binding)
 
 
-def handle_react_measurements(bindings):
+def handle_react_measurements(bindings,requesting_kb_id):
+    print("\n\n",requesting_kb_id,"\n\n")
     for binding in bindings:
         present_measurement(binding)
     return []

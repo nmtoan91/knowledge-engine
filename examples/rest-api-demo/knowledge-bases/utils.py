@@ -299,7 +299,7 @@ def my_start_handle_loop(handlers: dict[str, callable], kb_ids: str, ke_endpoint
                 handler = handlers[ki_id]
 
                 # pass the bindings to the handler, and let it handle them
-                result_bindings = handler(bindings)
+                result_bindings = handler(bindings,ki_id)
 
                 handle_response = requests.post(
                     ke_endpoint + "sc/handle",
