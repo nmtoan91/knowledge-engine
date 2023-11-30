@@ -12,6 +12,9 @@ class DeviceType(Enum):
     UNKNOWN =0
     TEMPERATURE_SENSOR =1
     WASHING_MACHINE = 2
+    def GetDeviceType(data):
+
+        return DeviceType.UNKNOWN
 
 class DeviceView(tk.Frame):
     
@@ -31,38 +34,51 @@ class DeviceView(tk.Frame):
         self.data_y = []
 
         frame = tk.Frame(root, bg='lavender', width=300, height=600, pady=10,padx = 10)
+        #frame = tk.Frame(root, bg='brown', width=300, height=600, pady=10,padx = 10)
         frame.grid_rowconfigure(1, weight=1)
         frame.grid_columnconfigure(0, weight=1)
         image = Image.open(r"examples/rest-api-demo/knowledge-bases/Images/"+iconname).resize((100, 100))
         my_img = ImageTk.PhotoImage(image)
-        my_label = tk.Label(frame,image=my_img)  
+        my_label = tk.Label(frame,image=my_img,bg='lavender')  
         my_label.img = my_img  
         my_label.grid( row=0,column=0, sticky=tk.N)
 
-        frame_buttons = tk.Frame(frame, width=100, height=100, pady=10,padx = 20)
+        frame_buttons = tk.Frame(frame,background='',width=100, height=100, pady=10,padx = 20)
         frame_buttons.grid( row=2,column=0, sticky=tk.N)
 
-        
-        self.button_flexible = tk.Button(frame_buttons, text="Flexible: OFF", fg="black", command=self.flexible_click)
-        self.button_flexible.pack(side=tk.LEFT)
+        label = tk.Label(frame_buttons,text="Flexible\nStart",bg='lavender')
+        label.pack(side=tk.LEFT)
 
-        self.button_operation = tk.Button(frame_buttons, text="Operation", command=self.operation_click)
-        self.button_operation.pack(side=tk.LEFT)
+        self.button_flexible = tk.Button(frame_buttons, text="Flexible: OFF", fg="black", command=self.flexible_click)
+        self.button_flexible.pack(side=tk.RIGHT)
+
+        frame_buttons2 = tk.Frame(frame, width=100,background='', height=100, pady=10,padx = 20)
+        frame_buttons2.grid( row=4,column=0, sticky=tk.N)
+
+        label = tk.Label(frame_buttons2,text="Manual\nOperation",bg='lavender')
+        label.pack(side=tk.LEFT)
+
+
+        self.button_operation = tk.Button(frame_buttons2, text="Operation", command=self.operation_click)
+        self.button_operation.pack(side=tk.RIGHT)
         self.UpdateUI_button_operation()
 
         self.frame = frame
 
         #self.figure = plt.figure(figsize=(2, 2))
         self.fig = plt.figure(figsize=(2, 2))
+        self.fig.patch.set_facecolor('lavender')
+        #self.fig.patch.set_alpha(0)
+        plt.subplots_adjust(left=0.18, bottom=0.15, right=0.95, top=0.95)
         self.ax = self.fig.add_subplot(111)
         
         self.scatter = FigureCanvasTkAgg(self.fig, frame)
-        self.scatter.get_tk_widget().grid( row=4,column=0, sticky=tk.S)
+        self.scatter.get_tk_widget().grid( row=6,column=0, sticky=tk.S)
 
-        frame_scale = tk.Frame(frame, width=100, height=100, pady=10,padx = 20)
-        frame_scale.grid( row=8,column=0, sticky=tk.N)
+        frame_scale = tk.Frame(frame,background='', width=100, height=100, pady=10,padx = 20)
+        frame_scale.grid( row=10,column=0, sticky=tk.N)
 
-        scalelabel = tk.Label(frame_scale,text="Limit\nPower")
+        scalelabel = tk.Label(frame_scale,text="Limit\nPower",bg='lavender')
         scalelabel.pack(side=tk.LEFT)
 
         self.scale = tk.Scale(frame_scale, from_=0, to=100, orient=tk.HORIZONTAL,length=200)

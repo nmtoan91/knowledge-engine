@@ -16,7 +16,7 @@ class MainView(threading.Thread):
         root = tk.Tk()
         root.geometry("600x800")
         root.title('Demonstation')
-        root.geometry('{}x{}'.format(600, 500))
+        root.geometry('{}x{}'.format(800, 650))
 
         root.columnconfigure(0, weight=1)
         root.columnconfigure(1, weight=1)
@@ -24,7 +24,7 @@ class MainView(threading.Thread):
         frame1  = DeviceView(root,"http://example.org/sensor",DeviceType.TEMPERATURE_SENSOR)
         frame2  = DeviceView(root,"http://example.org/washingmachine/mc1",DeviceType.WASHING_MACHINE)
         frame1.frame.grid(row=0, column =0)
-        frame2.frame.grid(row=0, column =1)
+        frame2.frame.grid(row=0, column =2)
 
         self.devices[frame1.id] = frame1
         self.devices[frame2.id] = frame2
@@ -33,7 +33,9 @@ class MainView(threading.Thread):
     def RevieveData(self, data,requestingKnowledgeBaseId):
         if requestingKnowledgeBaseId in self.devices:
              self.devices[requestingKnowledgeBaseId].RevieveData(data,requestingKnowledgeBaseId)
-        else: print("Cannot find view")
+        else: 
+            type = DeviceType.GetDeviceType(data)
+            print("Cannot find view",type)
     
 if __name__ == "__main__":
     mainView = MainView("My tkinter thread", 1000) 
