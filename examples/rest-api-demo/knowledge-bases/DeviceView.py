@@ -13,7 +13,8 @@ class DeviceType(Enum):
     TEMPERATURE_SENSOR =1
     WASHING_MACHINE = 2
     def GetDeviceType(data):
-
+        if 'esa' in data: return DeviceType.WASHING_MACHINE
+        if 'sensor' in data: return DeviceType.TEMPERATURE_SENSOR
         return DeviceType.UNKNOWN
 
 class DeviceView(tk.Frame):
@@ -68,6 +69,7 @@ class DeviceView(tk.Frame):
         #self.figure = plt.figure(figsize=(2, 2))
         self.fig = plt.figure(figsize=(2, 2))
         self.fig.patch.set_facecolor('lavender')
+        plt.switch_backend('agg')
         #self.fig.patch.set_alpha(0)
         plt.subplots_adjust(left=0.18, bottom=0.15, right=0.95, top=0.95)
         self.ax = self.fig.add_subplot(111)

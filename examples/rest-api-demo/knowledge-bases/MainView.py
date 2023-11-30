@@ -13,29 +13,35 @@ class MainView(threading.Thread):
 
     def run(self):
         self.devices = {}
-        root = tk.Tk()
-        root.geometry("600x800")
-        root.title('Demonstation')
-        root.geometry('{}x{}'.format(800, 650))
+        self.root = tk.Tk()
+        self.root.geometry("600x800")
+        self.root.title('Demonstation')
+        self.root.geometry('{}x{}'.format(900, 650))
 
-        root.columnconfigure(0, weight=1)
-        root.columnconfigure(1, weight=1)
+        self.root.columnconfigure(0, weight=1)
+        self.root.columnconfigure(1, weight=1)
 
-        frame1  = DeviceView(root,"http://example.org/sensor",DeviceType.TEMPERATURE_SENSOR)
-        frame2  = DeviceView(root,"http://example.org/washingmachine/mc1",DeviceType.WASHING_MACHINE)
-        frame1.frame.grid(row=0, column =0)
-        frame2.frame.grid(row=0, column =2)
+        #self.AddDevice("http://example.org/sensor",DeviceType.TEMPERATURE_SENSOR)
+        #self.AddDevice("http://example.org/washingmachine/mc1",DeviceType.WASHING_MACHINE)
 
-        self.devices[frame1.id] = frame1
-        self.devices[frame2.id] = frame2
 
-        root.mainloop()
+        self.root.mainloop()
+    
     def RevieveData(self, data,requestingKnowledgeBaseId):
         if requestingKnowledgeBaseId in self.devices:
              self.devices[requestingKnowledgeBaseId].RevieveData(data,requestingKnowledgeBaseId)
         else: 
             type = DeviceType.GetDeviceType(data)
-            print("Cannot find view",type)
+            if type == DeviceType.UNKNOWN: 
+                print("Cannot find view",type)
+                return
+            self.AddDevice(requestingKnowledgeBaseId,type)    
+
+    def AddDevice(self, deviceId, deviceType:DeviceType):
+        frame  = DeviceView(self.root,deviceId,deviceType)
+        index = len(self.devices)
+        frame.frame.grid(row=index//3, column =index%3)
+        self.devices[frame.id] = frame
     
 if __name__ == "__main__":
     mainView = MainView("My tkinter thread", 1000) 
