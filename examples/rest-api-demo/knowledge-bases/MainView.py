@@ -26,7 +26,8 @@ class MainView(threading.Thread):
 
 
         self.root.mainloop()
-    
+    def RunOnMainThread(self):
+        self.run()
     def RevieveData(self, data,requestingKnowledgeBaseId):
         if requestingKnowledgeBaseId in self.devices:
              self.devices[requestingKnowledgeBaseId].RevieveData(data,requestingKnowledgeBaseId)

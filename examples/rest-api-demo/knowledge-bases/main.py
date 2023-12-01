@@ -113,25 +113,34 @@ def start_ui_kb(kb_id, kb_name, kb_description, ke_endpoint):
 
 
 
+import threading 
+class KBInThread(threading.Thread):
+    def run(self):
+        time.sleep(1)
+        print('start_ui_kb')
+        start_ui_kb(
+            "http://example.org/ui3" + str(random.random()) ,
+            "UI",
+            "UI for measurement",
+            "http://150.65.230.93:8280/rest/",
+        )
 
 if __name__ == "__main__":
     add_sigterm_hook()
 
     import time
 
-    logger.info(
-        "sleeping a bit, so that there are some historical measurements that we can demonstrate to show"
-    )
-    
-
-    
-     
-    mainView.start() 
-    
-    time.sleep(1)
-    start_ui_kb(
-        "http://example.org/ui3" + str(random.random()) ,
-        "UI",
-        "UI for measurement",
-        "http://150.65.230.93:8280/rest/",
-    )
+    isUIOnMainThread = True
+    if isUIOnMainThread:
+        kbInThread = KBInThread()
+        kbInThread.start()
+        mainView.RunOnMainThread()
+    else:
+        mainView.start() 
+        time.sleep(1)
+        start_ui_kb(
+            "http://example.org/ui3" + str(random.random()) ,
+            "UI",
+            "UI for measurement",
+            "http://150.65.230.93:8280/rest/",
+        )
