@@ -2,7 +2,8 @@ import logging
 from MainView import MainView
 import random
 from utils import *
-import datetime
+from datetime import datetime
+import time
 mainView = MainView("My tkinter thread", 1000)
 
 logging.basicConfig(level=logging.INFO)
@@ -29,10 +30,10 @@ def present_measurement(binding: dict[str, str],requestingKnowledgeBaseId, histo
 
 
 def handle_react_measurements(bindings,requestingKnowledgeBaseId):
-    now = datetime.datetime.now()
+    now = datetime.now()
     for binding in bindings:
         present_measurement(binding,requestingKnowledgeBaseId)
-    print("end receving: ", (datetime.datetime.now() - now).seconds,"seconds")
+    print("end receving: ", (datetime.now() - now).seconds,"seconds")
     return []
 
 
@@ -119,13 +120,14 @@ class KBInThread(threading.Thread):
         time.sleep(1)
         print('start_ui_kb')
         start_ui_kb(
-            "http://example.org/ui3" + str(random.randint(0,10000)) ,
+            "http://example.org/ui3" + str(random.random()) ,
             "UI",
             "UI for measurement",
             "http://150.65.230.93:8280/rest/",
         )
 
 if __name__ == "__main__":
+    random.seed(datetime.now().timestamp())
     add_sigterm_hook()
 
     import time
@@ -135,11 +137,13 @@ if __name__ == "__main__":
         kbInThread = KBInThread()
         kbInThread.start()
         mainView.RunOnMainThread()
+        
     else:
         mainView.start() 
         time.sleep(1)
         start_ui_kb(
-            "http://example.org/ui3" + str(random.random()) ,
+            #"http://example.org/ui3" + str(random.random()) ,
+            "http://example.org/ui3" + str(random.randint(0,10000)) ,
             "UI",
             "UI for measurement",
             "http://150.65.230.93:8280/rest/",

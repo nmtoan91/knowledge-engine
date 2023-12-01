@@ -5,7 +5,7 @@ import logging
 import random
 from utils_echonet_controller import *
 from EchonetLITEDevice import EchonetLITEDeviceType,EchonetLITEDevice
-
+from datetime import datetime
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -62,10 +62,10 @@ def start_sensor_kb(kb_id, kb_name, kb_description, ke_endpoint):
 
     measurement_counter = 0
     while True:
-        now = datetime.datetime.now()
+        now = datetime.now()
         measurement_counter += 1
         value = generate_random_temperature(80, 100)
-        now = datetime.datetime.now()
+        now = datetime.now()
         post(
             [
                 {
@@ -96,7 +96,7 @@ def start_sensor_kb(kb_id, kb_name, kb_description, ke_endpoint):
             ke_endpoint,
         )
 
-        print(f"published measurement of {value} units at {now.isoformat()} time=", (datetime.datetime.now() - now).seconds,"seconds")
+        print(f"published measurement of {value} units at {now.isoformat()} time=", (datetime.now() - now).seconds,"seconds")
 
         time.sleep(2)
 
@@ -112,25 +112,26 @@ def Start(ke_endpoint):
 
     measurement_counter=0
     while True:
-        #now = datetime.datetime.now()
         measurement_counter += 1
-        #value = generate_random_temperature(80, 100)
         for key in devices:
             devices[key].TryToSendData()
-        #print('sending data')
         time.sleep(2)
 
 if __name__ == "__main__":
+    random.seed(datetime.now().timestamp())
     add_sigterm_hook()
-    Start(
-        "http://150.65.230.93:8280/rest/"
-    )
-    exit()
-    start_sensor_kb(
-        #"http://example.org/washingmachine/mc1"+ str(random.random()),
-        None,
-        "Sensor",
-        "A temperature sensor",
-        "http://150.65.230.93:8280/rest/",
-        #"http://localhost:8280/rest/",
-    )
+    isUsingClass = False
+
+    if isUsingClass:
+        Start(
+            "http://150.65.230.93:8280/rest/"
+        )
+    else:
+        start_sensor_kb(
+            #"http://example.org/washingmachine/mc1"+ str(random.randint(0,10000)),
+            None,
+            "Sensor",
+            "A temperature sensor",
+            "http://150.65.230.93:8280/rest/",
+            #"http://localhost:8280/rest/",
+        )

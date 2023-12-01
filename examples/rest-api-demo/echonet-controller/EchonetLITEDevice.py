@@ -41,56 +41,120 @@ class EchonetLITEDeviceType(Enum):
 
 class EchonetLITEDevice:
     def __init__(self,type:EchonetLITEDeviceType,kb_id,kb_name,kb_description,ke_endpoint):
-        self.measurement_counter = 0
-        self.type = type
-        self.kb_id = kb_id
-        self.kb_name = kb_name
-        self.kb_description= kb_description
+        # self.measurement_counter = 0
+        # self.type = type
+        #self.kb_id = kb_id
+        #self.kb_name = kb_name
+        #self.kb_description= kb_description
         self.ke_endpoint = ke_endpoint
         self.RegisterKnowledgeBase()
     def RegisterKnowledgeBase(self):
+        # register_knowledge_base(self.kb_id, self.kb_name, self.kb_description, self.ke_endpoint)
+        # self.ki_id = register_post_knowledge_interaction(EchonetLITEDeviceType.GetGraphByType(self.type),
+        #                                                 None,
+        #                                                 "post-measurements",#self.kb_name,
+        #                                                 self.kb_id,
+        #                                                 self.ke_endpoint,
+        #                                                 {
+        #                                                     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        #                                                     "saref": "https://saref.etsi.org/core/",
+        #                                                 },                
+        #                                                 )
+        self.kb_name = "Sensor"
+        self.kb_description= "A temperature sensor"
+        self.kb_id = "http://example.org/sensor" + str(random.randint(0,10000))
+        print("\n\n\n",self.kb_id,"\n\n\n\n")
         register_knowledge_base(self.kb_id, self.kb_name, self.kb_description, self.ke_endpoint)
-        self.ki_id = register_post_knowledge_interaction(EchonetLITEDeviceType.GetGraphByType(self.type),
-                                                        None,
-                                                        "post-measurements",#self.kb_name,
-                                                        self.kb_id,
-                                                        self.ke_endpoint,
-                                                        {
-                                                            "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-                                                            "saref": "https://saref.etsi.org/core/",
-                                                        },                
-                                                        )
+        ki_id = register_post_knowledge_interaction(
+            """
+                ?sensor rdf:type saref:Sensor .
+                ?measurement saref:measurementMadeBy ?sensor .
+                ?measurement saref:isMeasuredIn saref:TemperatureUnit .
+                ?measurement saref:hasValue ?temperature .
+                ?measurement saref:hasTimestamp ?timestamp .
+            """,
+            None,
+            "post-measurements",
+            self.kb_id,
+            self.ke_endpoint,
+            {
+                "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                "saref": "https://saref.etsi.org/core/",
+            },
+        )
+        measurement_counter=0
+        while True:
+            now = datetime.datetime.now()
+            measurement_counter += 1
+            value = generate_random_temperature(80, 100)
+            now = datetime.datetime.now()
+            post(
+                [
+                    {
+                        "sensor": "<https://example.org/sensor/1>",
+                        "measurement": f"<https://example.org/sensor/1/measurement/{measurement_counter}>",
+                        "temperature": f"{value}",
+                        "timestamp": f'"{now.isoformat()}"',
+                    }
+                ],
+                ki_id,
+                self.kb_id,
+                self.ke_endpoint,
+            )
+            print(f"published measurement of {value} units at {now.isoformat()} time=", (datetime.datetime.now() - now).seconds,"seconds")
+
+            time.sleep(2)
+
+        
+
     def TryToSendData(self):
-        now = datetime.datetime.now()
-        self.measurement_counter+=1
-        value = generate_random_temperature(80, 100)
-        if self.type == EchonetLITEDeviceType.TEMPERATURE_SENSOR:
-            data = {
-                    "sensor": f"<https://example.org/sensor/1>",
-                    "measurement": f"<https://example.org/sensor/1/measurement/{self.measurement_counter}>",
-                    "temperature": f"{value}",
-                    "timestamp": f'"{now.isoformat()}"',
-                }
-        elif self.type == EchonetLITEDeviceType.WASHING_MACHINE:
-            data = {
-                    "esa": "<https://example.org/washingmachine/1>",
-                    "commodity": "<https://example.org/commodity/electric>",
-                    "monitoring_of_power_consumption": f"<https://example.org/sensor/1/measurement/{self.measurement_counter}>",
-                    "power": f"<https://example.org/power/123>",
-                    "unit": f'"watt"',
-                    "value": f"{value}",
-                }
-        else: print("Error")
+        return
+        # now = datetime.datetime.now()
+        # self.measurement_counter+=1
+        # value = generate_random_temperature(80, 100)
+        # if self.type == EchonetLITEDeviceType.TEMPERATURE_SENSOR:
+        #     data = {
+        #             "sensor": f"<https://example.org/sensor/1>",
+        #             "measurement": f"<https://example.org/sensor/1/measurement/{self.measurement_counter}>",
+        #             "temperature": f"{value}",
+        #             "timestamp": f'"{now.isoformat()}"',
+        #         }
+        # elif self.type == EchonetLITEDeviceType.WASHING_MACHINE:
+        #     data = {
+        #             "esa": "<https://example.org/washingmachine/1>",
+        #             "commodity": "<https://example.org/commodity/electric>",
+        #             "monitoring_of_power_consumption": f"<https://example.org/sensor/1/measurement/{self.measurement_counter}>",
+        #             "power": f"<https://example.org/power/123>",
+        #             "unit": f'"watt"',
+        #             "value": f"{value}",
+        #         }
+        # else: print("Error")
         
         now = datetime.datetime.now()
        
+        # post(
+        #     [
+        #         data
+        #     ],
+        #     self.ki_id,
+        #     self.kb_id,
+        #     self.ke_endpoint,
+        # )
+        measurement_counter =0
+        value = 12
         post(
             [
-                data
+                {
+                    "sensor": "<https://example.org/sensor/1>",
+                    "measurement": f"<https://example.org/sensor/1/measurement/{measurement_counter}>",
+                    "temperature": f"{value}",
+                    "timestamp": f'"{now.isoformat()}"',
+                }
             ],
             self.ki_id,
             self.kb_id,
             self.ke_endpoint,
         )
+
         print("end posting: ", (datetime.datetime.now() - now).seconds,"seconds")
 
