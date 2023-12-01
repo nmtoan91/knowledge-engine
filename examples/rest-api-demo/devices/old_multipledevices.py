@@ -99,7 +99,7 @@ def start_sensor_kb(kb_id, kb_name, kb_description, ke_endpoint):
         logger.info(f"published measurement of {value} units at {now.isoformat()}")
 
         time.sleep(2)
-
+    
 
 if __name__ == "__main__":
     add_sigterm_hook()
@@ -109,6 +109,6 @@ if __name__ == "__main__":
         None,
         "Sensor",
         "A temperature sensor",
-        #"http://150.65.230.93:8280/rest/",
-        "http://localhost:8280/rest/",
+        "http://150.65.230.93:8280/rest/",
+        #"http://localhost:8280/rest/",
     )

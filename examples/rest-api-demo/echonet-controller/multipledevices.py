@@ -4,7 +4,6 @@ import random
 import logging
 import random
 from utils_echonet_controller import *
-from EchonetLITEDevice import EchonetLITEDeviceType,EchonetLITEDevice
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -70,6 +69,7 @@ def start_sensor_kb(kb_id, kb_name, kb_description, ke_endpoint):
             [
                 {
                     "sensor": "<https://example.org/sensor/1>",
+                    #"sensor": "<https://example.org/washingmachine/1>",
                     "measurement": f"<https://example.org/sensor/1/measurement/{measurement_counter}>",
                     "temperature": f"{value}",
                     "timestamp": f'"{now.isoformat()}"',
@@ -99,33 +99,11 @@ def start_sensor_kb(kb_id, kb_name, kb_description, ke_endpoint):
         logger.info(f"published measurement of {value} units at {now.isoformat()}")
 
         time.sleep(2)
-
-def Start(ke_endpoint):
-    devices = {}
-    device = EchonetLITEDevice(EchonetLITEDeviceType.TEMPERATURE_SENSOR,
-                               "http://example.org/sensor" + str(random.random()),
-                               "A-sensor",
-                               "A-sensor-description",
-                                 ke_endpoint      )
-    devices[device.kb_id] = device
-
-
-    measurement_counter=0
-    while True:
-        #now = datetime.datetime.now()
-        measurement_counter += 1
-        #value = generate_random_temperature(80, 100)
-        for key in devices:
-            devices[key].TryToSendData()
-        #print('sending data')
-        time.sleep(2)
+    
 
 if __name__ == "__main__":
     add_sigterm_hook()
-    Start(
-        "http://150.65.230.93:8280/rest/"
-    )
-    exit()
+
     start_sensor_kb(
         #"http://example.org/washingmachine/mc1"+ str(random.random()),
         None,

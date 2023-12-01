@@ -13,30 +13,27 @@ class EchonetLITEDeviceType(Enum):
     UNKNOWN =0
     TEMPERATURE_SENSOR =1
     WASHING_MACHINE = 2
-    # def GetDeviceType(data):
-    #     if 'esa' in data: return DeviceType.WASHING_MACHINE
-    #     if 'sensor' in data: return DeviceType.TEMPERATURE_SENSOR
-    #     return DeviceType.UNKNOWN
     def GetGraphByType(type):
         if type == EchonetLITEDeviceType.TEMPERATURE_SENSOR:
             return """
-            ?sensor rdf:type saref:Sensor .
-            ?measurement saref:measurementMadeBy ?sensor .
-            ?measurement saref:isMeasuredIn saref:TemperatureUnit .
-            ?measurement saref:hasValue ?temperature .
-            ?measurement saref:hasTimestamp ?timestamp .
-        """
+                        ?sensor rdf:type saref:Sensor .
+                        ?measurement saref:measurementMadeBy ?sensor .
+                        ?measurement saref:isMeasuredIn saref:TemperatureUnit .
+                        ?measurement saref:hasValue ?temperature .
+                        ?measurement saref:hasTimestamp ?timestamp .
+                    """
+        
         if type == EchonetLITEDeviceType.WASHING_MACHINE:
-            return """
-            ?esa rdf:type saref:Device .
-            ?esa saref:isUsedFor ?commodity .
-            ?commodity rdf:type saref:Electricity .
-            ?esa saref:makesMeasurement ?monitoring_of_power_consumption .
-            ?monitoring_of_power_consumption saref:relatesToProperty ?power .
-            ?power rdf:type saref:Power .
-            ?monitoring_of_power_consumption saref:isMeasuredIn ?unit .
-            ?monitoring_of_power_consumption saref:hasValue ?value .
-        """
+            return  """
+                        ?esa rdf:type saref:Device .
+                        ?esa saref:isUsedFor ?commodity .
+                        ?commodity rdf:type saref:Electricity .
+                        ?esa saref:makesMeasurement ?monitoring_of_power_consumption .
+                        ?monitoring_of_power_consumption saref:relatesToProperty ?power .
+                        ?power rdf:type saref:Power .
+                        ?monitoring_of_power_consumption saref:isMeasuredIn ?unit .
+                        ?monitoring_of_power_consumption saref:hasValue ?value .
+                    """
     
 
 
@@ -86,6 +83,7 @@ class EchonetLITEDevice:
         else: print("Error")
         
         now = datetime.datetime.now()
+       
         post(
             [
                 data
