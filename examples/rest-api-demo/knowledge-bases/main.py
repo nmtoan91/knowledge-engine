@@ -2,7 +2,7 @@ import logging
 from MainView import MainView
 import random
 from utils import *
-
+import datetime
 mainView = MainView("My tkinter thread", 1000)
 
 logging.basicConfig(level=logging.INFO)
@@ -29,8 +29,10 @@ def present_measurement(binding: dict[str, str],requestingKnowledgeBaseId, histo
 
 
 def handle_react_measurements(bindings,requestingKnowledgeBaseId):
+    now = datetime.datetime.now()
     for binding in bindings:
         present_measurement(binding,requestingKnowledgeBaseId)
+    print("end receving: ", (datetime.datetime.now() - now).seconds,"seconds")
     return []
 
 
