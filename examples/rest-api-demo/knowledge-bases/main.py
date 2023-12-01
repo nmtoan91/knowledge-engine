@@ -119,7 +119,7 @@ class KBInThread(threading.Thread):
         time.sleep(1)
         print('start_ui_kb')
         start_ui_kb(
-            "http://example.org/ui3" + str(random.random()) ,
+            "http://example.org/ui3" + str(random.randint(0,10000)) ,
             "UI",
             "UI for measurement",
             "http://150.65.230.93:8280/rest/",

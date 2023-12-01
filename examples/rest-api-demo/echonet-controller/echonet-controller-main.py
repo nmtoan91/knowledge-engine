@@ -16,7 +16,7 @@ def generate_random_temperature(start=15.0, end=20.0):
 
 
 def start_sensor_kb(kb_id, kb_name, kb_description, ke_endpoint):
-    kb_id = "http://example.org/sensor" + str(random.random())
+    kb_id = "http://example.org/sensor" + str(random.randint(0,10000))
     register_knowledge_base(kb_id, kb_name, kb_description, ke_endpoint)
     ki_id = register_post_knowledge_interaction(
         """
@@ -35,7 +35,7 @@ def start_sensor_kb(kb_id, kb_name, kb_description, ke_endpoint):
             "saref": "https://saref.etsi.org/core/",
         },
     )
-    kb_id2 = "http://example.org/washingmachine/mc1"+ str(random.random())
+    kb_id2 = "http://example.org/washingmachine/mc1"+ str(random.randint(0,10000))
     register_knowledge_base(kb_id2, kb_name, kb_description, ke_endpoint)
     ki_id2 = register_post_knowledge_interaction(
         """
@@ -65,7 +65,7 @@ def start_sensor_kb(kb_id, kb_name, kb_description, ke_endpoint):
         now = datetime.datetime.now()
         measurement_counter += 1
         value = generate_random_temperature(80, 100)
-
+        now = datetime.datetime.now()
         post(
             [
                 {
@@ -96,16 +96,16 @@ def start_sensor_kb(kb_id, kb_name, kb_description, ke_endpoint):
             ke_endpoint,
         )
 
-        logger.info(f"published measurement of {value} units at {now.isoformat()}")
+        print(f"published measurement of {value} units at {now.isoformat()} time=", (datetime.datetime.now() - now).seconds,"seconds")
 
         time.sleep(2)
 
 def Start(ke_endpoint):
     devices = {}
     device = EchonetLITEDevice(EchonetLITEDeviceType.TEMPERATURE_SENSOR,
-                               "http://example.org/sensor" + str(random.random()),
-                               "A-sensor",
-                               "A-sensor-description",
+                               "http://example.org/sensor" + str(random.randint(0,10000)),
+                               "Sensor",
+                               "A temperature sensor",
                                  ke_endpoint      )
     devices[device.kb_id] = device
 

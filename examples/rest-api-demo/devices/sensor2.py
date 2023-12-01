@@ -39,7 +39,7 @@ def start_sensor_kb(kb_id, kb_name, kb_description, ke_endpoint):
         now = datetime.datetime.now()
         measurement_counter += 1
         value = generate_random_temperature(12, 26)
-
+        now = datetime.datetime.now()
         post(
             [
                 {
@@ -53,7 +53,7 @@ def start_sensor_kb(kb_id, kb_name, kb_description, ke_endpoint):
             kb_id,
             ke_endpoint,
         )
-        logger.info(f"published measurement of {value} units at {now.isoformat()}")
+        logger.info(f"published measurement of {value} units at {now.isoformat()} time={(datetime.datetime.now() - now).seconds} seconds")
 
         time.sleep(2)
 
@@ -62,8 +62,9 @@ if __name__ == "__main__":
     add_sigterm_hook()
 
     start_sensor_kb(
-        "http://example.org/sensor",
+        "http://example.org/sensor" + str(random.randint(0,10000)),
         "Sensor",
         "A temperature sensor",
-        "http://localhost:8280/rest/",
+        #"http://localhost:8280/rest/",
+        "http://150.65.230.93:8280/rest/",
     )

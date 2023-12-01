@@ -52,7 +52,7 @@ class EchonetLITEDevice:
         register_knowledge_base(self.kb_id, self.kb_name, self.kb_description, self.ke_endpoint)
         self.ki_id = register_post_knowledge_interaction(EchonetLITEDeviceType.GetGraphByType(self.type),
                                                         None,
-                                                        self.kb_name,
+                                                        "post-measurements",#self.kb_name,
                                                         self.kb_id,
                                                         self.ke_endpoint,
                                                         {
