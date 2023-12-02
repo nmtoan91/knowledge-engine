@@ -206,6 +206,7 @@ def post(
         headers={"Knowledge-Base-Id": kb_id, "Knowledge-Interaction-Id": ki_id},
         json=bindings,
     )
+    print("\n\n",{"Knowledge-Base-Id": kb_id, "Knowledge-Interaction-Id": ki_id},"\n",bindings, "\n\n")
     assert response.ok,response.text
 
     return response.json()["resultBindingSet"]
