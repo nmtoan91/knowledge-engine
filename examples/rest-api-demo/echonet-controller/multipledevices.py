@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import time
 import random
 import logging
@@ -61,7 +61,7 @@ def start_sensor_kb(kb_id, kb_name, kb_description, ke_endpoint):
 
     measurement_counter = 0
     while True:
-        now = datetime.datetime.now()
+        now = datetime.now()
         measurement_counter += 1
         value = generate_random_temperature(80, 100)
 

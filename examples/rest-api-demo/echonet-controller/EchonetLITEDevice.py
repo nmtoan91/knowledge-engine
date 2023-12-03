@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import time
 import random
 import logging
@@ -110,10 +110,10 @@ class EchonetLITEDevice:
         
 
     def TryToSendData(self):
-        now = datetime.datetime.now()
+        now = datetime.now()
         #measurement_counter += 1
         value = generate_random_temperature(80, 100)
-        now = datetime.datetime.now()
+        now = datetime.now()
         post(
             [
                 {
@@ -127,7 +127,7 @@ class EchonetLITEDevice:
             self.kb_id,
             self.ke_endpoint,
         )
-        print(f"published measurement of {value} units at {now.isoformat()} time=", (datetime.datetime.now() - now).seconds,"seconds")
+        print(f"published measurement of {value} units at {now.isoformat()} time=", (datetime.now() - now).seconds,"seconds")
         
         return
         # now = datetime.datetime.now()

@@ -120,7 +120,7 @@ def Start(ke_endpoint):
 if __name__ == "__main__":
     random.seed(datetime.now().timestamp())
     add_sigterm_hook()
-    isUsingClass = True
+    isUsingClass = False
 
     if isUsingClass:
         Start(
