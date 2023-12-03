@@ -22,6 +22,7 @@ def present_measurement(binding: dict[str, str], historical: bool = False):
 
 
 def handle_react_measurements(bindings):
+    print()
     for binding in bindings:
         present_measurement(binding)
     return []

@@ -109,18 +109,21 @@ def Start(ke_endpoint):
                                  ke_endpoint      )
     devices[device.kb_id] = device
 
+    device = EchonetLITEDevice(EchonetLITEDeviceType.WASHING_MACHINE,
+                               "http://example.org/washingmachine" + str(random.randint(0,10000)),
+                               "Washingmachine",
+                               "A Washingmachine sensor",
+                                 ke_endpoint      )
+    devices[device.kb_id] = device
 
-    measurement_counter=0
+    
     while True:
-        measurement_counter += 1
-        for key in devices:
-            devices[key].TryToSendData()
         time.sleep(2)
 
 if __name__ == "__main__":
     random.seed(datetime.now().timestamp())
     add_sigterm_hook()
-    isUsingClass = False
+    isUsingClass = True
 
     if isUsingClass:
         Start(

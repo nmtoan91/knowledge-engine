@@ -235,12 +235,12 @@ def start_handle_loop(handlers: dict[str, callable], kb_id: str, ke_endpoint: st
             ki_id = handle_request["knowledgeInteractionId"]
             handle_request_id = handle_request["handleRequestId"]
             bindings = handle_request["bindingSet"]
-
+            requestingKnowledgeBaseId = handle_request["requestingKnowledgeBaseId"]
             assert ki_id in handlers
             handler = handlers[ki_id]
 
             # pass the bindings to the handler, and let it handle them
-            result_bindings = handler(bindings)
+            result_bindings = handler(bindings,requestingKnowledgeBaseId)
 
             handle_response = requests.post(
                 ke_endpoint + "sc/handle",

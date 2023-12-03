@@ -8,7 +8,8 @@ mainView = MainView("My tkinter thread", 1000)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
+import threading
+from concurrent.futures import Future
 
 def present_measurement(binding: dict[str, str],requestingKnowledgeBaseId, historical: bool = False):
     s = "data="
@@ -36,6 +37,14 @@ def handle_react_measurements(bindings,requestingKnowledgeBaseId):
     print("end receving: ", (datetime.now() - now).seconds,"seconds")
     return []
 
+def my_loop(react_measurements_ki,kb_id,ke_endpoint):
+    start_handle_loop(
+        {
+            react_measurements_ki: handle_react_measurements,
+        },
+        kb_id,
+        ke_endpoint,
+    )
 
 def start_ui_kb(kb_id, kb_name, kb_description, ke_endpoint):
     #Sensor
@@ -57,20 +66,8 @@ def start_ui_kb(kb_id, kb_name, kb_description, ke_endpoint):
             "saref": "https://saref.etsi.org/core/",
         },
     )
-
-    # start_handle_loop(
-    #     {
-    #         react_measurements_ki: handle_react_measurements,
-    #     },
-    #     kb_id,
-    #     ke_endpoint,
-    # )
-    #return
-    #Washing machine
     kb_id2 = kb_id+str(2)
-    #kb_id2 = kb_id
     register_knowledge_base(kb_id2, kb_name, kb_description, ke_endpoint)
-    
     react_measurements_ki2 = register_react_knowledge_interaction(
         """
             ?esa rdf:type saref:Device .
@@ -92,26 +89,13 @@ def start_ui_kb(kb_id, kb_name, kb_description, ke_endpoint):
         },
     )
 
-    my_start_handle_loop(
-        {
-            react_measurements_ki2: handle_react_measurements,
-            react_measurements_ki: handle_react_measurements,
-        },
-        [kb_id,kb_id2],
-        ke_endpoint,
-    )
 
-    start_handle_loop(
-        {
-            react_measurements_ki2: handle_react_measurements,
-            react_measurements_ki: handle_react_measurements,
-        },
-        kb_id,
-        ke_endpoint,
-    )
-    #print("\n\n\n\n\n\n CCCCCCCCCCCCCCCCCCCCCCCCC \n\n\n\n")
-
-
+    x = threading.Thread(target=my_loop, args=(react_measurements_ki,kb_id,ke_endpoint))
+    x.start()
+    x2 = threading.Thread(target=my_loop, args=(react_measurements_ki2,kb_id2,ke_endpoint))
+    x2.start()
+    while True:
+        time.sleep(1)
 
 
 import threading 
@@ -132,7 +116,7 @@ if __name__ == "__main__":
 
     import time
 
-    isUIOnMainThread = False
+    isUIOnMainThread = True
     if isUIOnMainThread:
         kbInThread = KBInThread()
         kbInThread.start()
