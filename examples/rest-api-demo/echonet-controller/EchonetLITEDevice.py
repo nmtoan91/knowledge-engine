@@ -84,36 +84,38 @@ class EchonetLITEDevice:
         self.GetData()
         #self.StartSendingThread()
     def GetData(self):
+        sotangdan =1
         response = requests.get(self.el_endpoint+'/elapi/v1/devices/' + self.el_id+'/properties')
         self.el_data = json.loads(response.text)
-        esa = 11111
-        commodity = "electric"
-        commodityProperty = "commodityProperty"
-        power= 23
-        powerProfile= "powerProfile"
-        nodeRemoteControllable = "nodeRemoteControllable"
-        supportsReselection = "supportsReselection"
-        alternativesgroup = "alternativesgroup"
-        alternativesID = "alternativesID"
-        powerSequence = "powerSequence"
-        sequenceID= "sequenceID"
-        powerSequenceState = "powerSequenceState"
-        activeSlotNumber = 2344
-        sequenceRemoteControllable = "sequenceRemoteControllable"
-        startTime= 2013
-        endTime = 2023
-        earliestStartTime = 2015
-        latestEndTime= 2019
-        isPausable= 0
-        isStoppable=1
-        valueSource=2
-        powerSequenceSlot= 23
-        powerSequenceSlotNumber= 23
-        powerSequenceSlotDefaultDuration= 34
-        powerSequenceSlotPower = 46
-        powerSequenceSlotProperty= 34
-        powerSequenceSlotPowerType= 345
-        powerSequenceSlotValue= 45
+        prefix = "http://jaist.ac.com/"
+        esa = prefix+"esa"+self.el_id
+        commodity = prefix+"commodity" + self.el_id
+        commodityProperty = prefix+"commodityProperty"+ self.el_id
+        power= prefix + "power" +  self.el_id
+        powerProfile= prefix +"powerProfile" +  self.el_id
+        nodeRemoteControllable =  "True"
+        supportsReselection = "True"
+        alternativesgroup = prefix + "alternativesgroup" + self.el_id
+        alternativesID = "echonet" +  self.el_id
+        powerSequence = prefix + "powerSequence" + self.el_id
+        sequenceID= powerSequence + str(sotangdan)
+        powerSequenceState = "s4ener:"+"Inactive"  #Important  Scheduled, Inactive, Invalid, Running, Paused, SchduledPaused, Pending, Completed
+        activeSlotNumber = 1
+        sequenceRemoteControllable = "True"
+        startTime= "2023-12-04 15:23:12"
+        endTime = "2023-12-04 15:23:12"
+        earliestStartTime = "2023-12-04 15:23:12"
+        latestEndTime= "2023-12-04 15:23:12"
+        isPausable= "True"
+        isStoppable= "True"
+        valueSource= "s4ener:"+"Measured" # Calculated, Empirical
+        powerSequenceSlot= prefix + "powerSequenceSlot" + self.el_id
+        powerSequenceSlotNumber= "1251121"
+        powerSequenceSlotDefaultDuration= "P0Y1M3DT4H5M10S"
+        powerSequenceSlotPower = prefix + "powerSequenceSlotPower" + self.el_id
+        powerSequenceSlotProperty= "s4ener:"+"Power"
+        powerSequenceSlotPowerType= "s4ener:"+"Expected" #or "Minimum" "Maximum"
+        powerSequenceSlotValue= 23 #IMPORTANT
         data_FLEXIBLE_START = {
             "esa": f"<https://example.org/power/{esa}>",
             "commodity": f"<https://example.org/commodity/{commodity}>",
