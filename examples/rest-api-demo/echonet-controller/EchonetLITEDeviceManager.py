@@ -222,7 +222,7 @@ class EnergyUseCase:
             self.kb_id,
             self.echonetLITEDeviceManager.ke_endpoint,
         )
-        print("Sending data (", (datetime.now()-now).seconds, "seconds):", data)
+        print("\nSending data (", (datetime.now()-now).seconds, "seconds):", data)
     
 
     def RegisterKnowledgeBase(self):
