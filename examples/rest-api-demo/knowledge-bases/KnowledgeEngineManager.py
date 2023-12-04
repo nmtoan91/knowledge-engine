@@ -3,15 +3,20 @@ import time
 import random
 import logging
 import random
-from utils_echonet_controller import *
+from utils import *
 from enum import Enum
 import threading
 from concurrent.futures import Future
-from EchonetLITEDevice import EchonetLITEDevice,EnergyUseCaseType
-from EchonetLITEDevice import EchonetLITEDeviceType
 import json
 
-
+class EnergyUseCaseType(Enum):
+    UNKNOWN=0,
+    FLEXIBLE_START="FLEXIBLE_START"
+    MONITORING_POWER_CONSUMPTION = "MONITORING_POWER_CONSUMPTION"
+    LIMITATION_POWER_CONSUMPTION="LIMITATION_POWER_CONSUMPTION"
+    MANAGEMENT_POWER_CONSUMPTION_INCENTIVE_TABLE="MANAGEMENT_POWER_CONSUMPTION_INCENTIVE_TABLE"
+    MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN="MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN"
+    MANUAL_OPERATION="MANUAL_OPERATION"
 
     
 class EnergyUseCase:
@@ -249,78 +254,3 @@ class EnergyUseCase:
             },
         )
 
-
-
-
-class EchonetLITEDeviceManager:
-    def __init__(self,ke_endpoint):
-        self.devices = {}
-        self.ke_endpoint= ke_endpoint
-        self.el_endpoint = "http://150.65.231.106:6000"
-        self.initialized = False
-    def AddTestDevices(self):
-        device = EchonetLITEDevice(EchonetLITEDeviceType.TEMPERATURE_SENSOR,
-                                "http://example.org/sensor" + str(random.randint(0,10000)),
-                                "Sensor",
-                                "A temperature sensor",
-                                    self.ke_endpoint,self.el_endpoint ,None ,self    )
-        self.devices[device.kb_id] = device
-
-        device = EchonetLITEDevice(EchonetLITEDeviceType.WASHING_MACHINE,
-                                "http://example.org/washingmachine" + str(random.randint(0,10000)),
-                                "Washingmachine",
-                                "A Washingmachine sensor",
-                                    self.ke_endpoint      ,self.el_endpoint,None,self)
-        self.devices[device.kb_id] = device
-    def GetInforFromEchonetLITEServer(self):
-        response = requests.get(self.el_endpoint + "/elapi/v1/devices/")
-        
-
-        data = json.loads(response.text)
-        for deviceInfo in  data['devices']:
-            key = deviceInfo['id']
-            desc = deviceInfo['manufacturer']['descriptions']['en']
-            if key not in self.devices:
-                deviceType = deviceInfo['deviceType']
-                device = EchonetLITEDevice(EchonetLITEDeviceType(deviceType),
-                                "http://jaist.org/device_"+ key+ str(random.randint(0,10000)),
-                                deviceType+":"+key,
-                                desc,
-                                    self.ke_endpoint ,self.el_endpoint, key ,self    )
-                self.devices[device.kb_id] = device
-                break #test only
-            
-        asd=123
-    def RegisterGraphs(self):
-        
-
-        self.energyCases = {}
-        self.energyCases[EnergyUseCaseType.FLEXIBLE_START]=EnergyUseCase(EnergyUseCaseType.FLEXIBLE_START,self)
-        # self.energyCases[EnergyUseCaseType.MONITORING_POWER_CONSUMPTION]=EnergyUseCase(EnergyUseCaseType.MONITORING_POWER_CONSUMPTION,self)
-        # self.energyCases[EnergyUseCaseType.LIMITATION_POWER_CONSUMPTION]=EnergyUseCase(EnergyUseCaseType.LIMITATION_POWER_CONSUMPTION,self)
-        # self.energyCases[EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_INCENTIVE_TABLE]=EnergyUseCase(EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_INCENTIVE_TABLE,self)
-        # self.energyCases[EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN]=EnergyUseCase(EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN,self)
-        # self.energyCases[EnergyUseCaseType.MANUAL_OPERATION]=EnergyUseCase(EnergyUseCaseType.MANUAL_OPERATION,self)
-
-
-        for key in self.energyCases:
-            self.energyCases[key].RegisterKnowledgeBase()
-        self.initialized = True
-
-    def SendMultipleData(self,multipleData):
-        for key in multipleData:
-            data = multipleData[key]
-            if key not in self.energyCases: continue
-            self.energyCases[key].SendData(data)
-
-    def StartLoop(self,isLoop=True):
-        self.RegisterGraphs()
-        self.GetInforFromEchonetLITEServer()
-        
-        if isLoop:
-            while True:
-                time.sleep(2)
-
-if __name__ == '__main__':
-    echonetLITEDeviceManager = EchonetLITEDeviceManager("http://150.65.230.93:8280/rest/")
-    echonetLITEDeviceManager.StartLoop(False)

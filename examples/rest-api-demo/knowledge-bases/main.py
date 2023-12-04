@@ -4,6 +4,8 @@ import random
 from utils import *
 from datetime import datetime
 import time
+import threading 
+import time
 mainView = MainView("My tkinter thread", 1000)
 
 logging.basicConfig(level=logging.INFO)
@@ -17,16 +19,6 @@ def present_measurement(binding: dict[str, str],requestingKnowledgeBaseId, histo
         s += f"{key}:{value}  "
     print(s)
 
-    # if historical:
-    #     print(
-    #         f"[HISTORICAL] Temperature was {binding['temperature']} units at {binding['timestamp'][1:-1]}",
-    #         flush=True,
-    #     )
-    # else:
-    #     print(
-    #         f"[NEW!] ffffff is {binding['temperature']} units at {binding['timestamp'][1:-1]}",
-    #         flush=True,
-    #     )
     mainView.RevieveData(binding,requestingKnowledgeBaseId)
 
 
@@ -98,7 +90,7 @@ def start_ui_kb(kb_id, kb_name, kb_description, ke_endpoint):
         time.sleep(1)
 
 
-import threading 
+
 class KBInThread(threading.Thread):
     def run(self):
         time.sleep(1)
@@ -114,21 +106,7 @@ if __name__ == "__main__":
     random.seed(datetime.now().timestamp())
     add_sigterm_hook()
 
-    import time
+    kbInThread = KBInThread()
+    kbInThread.start()
+    mainView.RunOnMainThread()
 
-    isUIOnMainThread = True
-    if isUIOnMainThread:
-        kbInThread = KBInThread()
-        kbInThread.start()
-        mainView.RunOnMainThread()
-        
-    else:
-        mainView.start() 
-        time.sleep(1)
-        start_ui_kb(
-            #"http://example.org/ui3" + str(random.random()) ,
-            "http://example.org/ui3" + str(random.randint(0,10000)) ,
-            "UI",
-            "UI for measurement",
-            "http://150.65.230.93:8280/rest/",
-        )

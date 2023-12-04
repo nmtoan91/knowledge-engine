@@ -81,12 +81,18 @@ class EchonetLITEDevice:
         self.echonetLITEDeviceManager = echonetLITEDeviceManager
         self.isDirty = False
         self.structureData = {}
-        self.GetData()
+        #self.GetData()
+        x = threading.Thread(target=self.GetDataThread, args=())
+        x.start()
+    def GetDataThread(self):
+        while True:
+            self.GetData()   
+            time.sleep(2)
         #self.StartSendingThread()
     def GetData(self):
         sotangdan =1
         response = requests.get(self.el_endpoint+'/elapi/v1/devices/' + self.el_id+'/properties')
-        self.el_data = json.loads(response.text)
+        self.el_data =data = json.loads(response.text)
         prefix = "http://jaist.ac.com/"
         esa = prefix+"esa"+self.el_id
         commodity = prefix+"commodity" + self.el_id
@@ -115,7 +121,8 @@ class EchonetLITEDevice:
         powerSequenceSlotPower = prefix + "powerSequenceSlotPower" + self.el_id
         powerSequenceSlotProperty= "s4ener:"+"Power"
         powerSequenceSlotPowerType= "s4ener:"+"Expected" #or "Minimum" "Maximum"
-        powerSequenceSlotValue= 23 #IMPORTANT
+        #IMPORTANT
+        powerSequenceSlotValue= data['instantaneousElectricPowerConsumption']
         data_FLEXIBLE_START = {
             "esa": f"<https://example.org/power/{esa}>",
             "commodity": f"<https://example.org/commodity/{commodity}>",
@@ -347,39 +354,39 @@ class EchonetLITEDevice:
         asd=123
 
 
-    def TryToSendData(self):
-        if not self.isDirty: return
+    # def TryToSendData(self):
+    #     if not self.isDirty: return
 
-        now = datetime.now()
-        self.measurement_counter += 1
-        value = generate_random_temperature(80, 100)
-        if self.type == EchonetLITEDeviceType.TEMPERATURE_SENSOR:
-            data = {
-                "sensor": f"<https://example.org/sensor/1>",
-                "measurement": f"<https://example.org/sensor/1/measurement/{self.measurement_counter}>",
-                "temperature": f"{value}",
-                "timestamp": f'"{now.isoformat()}"',
-            }
-        elif self.type == EchonetLITEDeviceType.WASHING_MACHINE:
-            data = {
-                "esa": "<https://example.org/washingmachine/1>",
-                "commodity": "<https://example.org/commodity/electric>",
-                "monitoring_of_power_consumption": f"<https://example.org/sensor/1/measurement/{self.measurement_counter}>",
-                "power": f"<https://example.org/power/123>",
-                "unit": f'"watt"',
-                "value": f"{value}",
-            }
-        else:
-            print("Error")
+    #     now = datetime.now()
+    #     self.measurement_counter += 1
+    #     value = generate_random_temperature(80, 100)
+    #     if self.type == EchonetLITEDeviceType.TEMPERATURE_SENSOR:
+    #         data = {
+    #             "sensor": f"<https://example.org/sensor/1>",
+    #             "measurement": f"<https://example.org/sensor/1/measurement/{self.measurement_counter}>",
+    #             "temperature": f"{value}",
+    #             "timestamp": f'"{now.isoformat()}"',
+    #         }
+    #     elif self.type == EchonetLITEDeviceType.WASHING_MACHINE:
+    #         data = {
+    #             "esa": "<https://example.org/washingmachine/1>",
+    #             "commodity": "<https://example.org/commodity/electric>",
+    #             "monitoring_of_power_consumption": f"<https://example.org/sensor/1/measurement/{self.measurement_counter}>",
+    #             "power": f"<https://example.org/power/123>",
+    #             "unit": f'"watt"',
+    #             "value": f"{value}",
+    #         }
+    #     else:
+    #         print("Error")
 
-        now = datetime.now()
+    #     now = datetime.now()
 
-        post(
-            [
-                data
-            ],
-            self.ki_id,
-            self.kb_id,
-            self.ke_endpoint,
-        )
-        print("\nSending data (", (datetime.now()-now).seconds, "seconds):", data,"\n")
+    #     post(
+    #         [
+    #             data
+    #         ],
+    #         self.ki_id,
+    #         self.kb_id,
+    #         self.ke_endpoint,
+    #     )
+    #     print("\nSending data (", (datetime.now()-now).seconds, "seconds):", data,"\n")
