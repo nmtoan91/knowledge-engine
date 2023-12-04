@@ -262,7 +262,7 @@ class EnergyUseCase:
             s += f"{key}:{value}  "
         print(s)
 
-        #mainView.RevieveData(binding,requestingKnowledgeBaseId)
+        self.manager.mainView.ReceiveData(binding,requestingKnowledgeBaseId,self.type)
 
 
     def handle_react_measurements(self,bindings,requestingKnowledgeBaseId):

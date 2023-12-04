@@ -28,9 +28,9 @@ class MainView(threading.Thread):
         self.root.mainloop()
     def RunOnMainThread(self):
         self.run()
-    def RevieveData(self, data,requestingKnowledgeBaseId):
+    def ReceiveData(self, data,requestingKnowledgeBaseId,energyUseCaseType):
         if requestingKnowledgeBaseId in self.devices:
-             self.devices[requestingKnowledgeBaseId].RevieveData(data,requestingKnowledgeBaseId)
+             self.devices[requestingKnowledgeBaseId].ReceiveData(data,requestingKnowledgeBaseId,energyUseCaseType)
         else: 
             type = DeviceType.GetDeviceType(data)
             if type == DeviceType.UNKNOWN: 
