@@ -7,14 +7,26 @@ from utils_echonet_controller import *
 from enum import Enum
 import threading
 from concurrent.futures import Future
+import json
+
 def generate_random_temperature(start=15.0, end=20.0):
     assert end > start
     return start + (end - start) * random.random()
 
+
 class EchonetLITEDeviceType(Enum):
-    UNKNOWN =0
-    TEMPERATURE_SENSOR =1
+    UNKNOWN = 0
+    TEMPERATURE_SENSOR = 1
     WASHING_MACHINE = 2
+    AIR_CONDITIONER_VENTILATION_FAN = 'airConditionerVentilationFan'
+    HYBRID_WATER_HEATER = 'hybridWaterHeater'
+    WASHER_DRYER = 'washerDryer'
+    INSTANTANEOUS_WATER_HEATER = 'instantaneousWaterHeater'
+    FLOOR_HEATER = 'floorHeater'
+    ELECTRIC_WATER_HEATER = 'electricWaterHeater'
+    BATHROOM_HEATER_DRYER = 'bathroomHeaterDryer'
+    VENTILATION_FAN = 'ventilationFan'
+
     def GetGraphByType(type):
         if type == EchonetLITEDeviceType.TEMPERATURE_SENSOR:
             return """
@@ -24,9 +36,9 @@ class EchonetLITEDeviceType(Enum):
                         ?measurement saref:hasValue ?temperature .
                         ?measurement saref:hasTimestamp ?timestamp .
                     """
-        
+
         if type == EchonetLITEDeviceType.WASHING_MACHINE:
-            return  """
+            return """
                         ?esa rdf:type saref:Device .
                         ?esa saref:isUsedFor ?commodity .
                         ?commodity rdf:type saref:Electricity .
@@ -36,22 +48,38 @@ class EchonetLITEDeviceType(Enum):
                         ?monitoring_of_power_consumption saref:isMeasuredIn ?unit .
                         ?monitoring_of_power_consumption saref:hasValue ?value .
                     """
-    
-
-
-
+        
+        print ("[Error] Cannot find graph defines")
+        return """
+                        ?sensor rdf:type saref:Sensor .
+                        ?measurement saref:measurementMadeBy ?sensor .
+                        ?measurement saref:isMeasuredIn saref:TemperatureUnit .
+                        ?measurement saref:hasValue ?temperature .
+                        ?measurement saref:hasTimestamp ?timestamp .
+                    """
 
 class EchonetLITEDevice:
-    def __init__(self,type:EchonetLITEDeviceType,kb_id,kb_name,kb_description,ke_endpoint):
+    def __init__(self, type: EchonetLITEDeviceType, kb_id, kb_name, kb_description, ke_endpoint,el_endpoint,el_id,echonetLITEDeviceManager):
+        self.el_id = el_id
+        self.el_endpoint = el_endpoint
         self.measurement_counter = 0
         self.type = type
         self.kb_id = kb_id
         self.kb_name = kb_name
-        self.kb_description= kb_description
+        self.kb_description = kb_description
         self.ke_endpoint = ke_endpoint
+        self.echonetLITEDeviceManager = echonetLITEDeviceManager
+        self.isDirty = False
+
+        self.GetData()
         self.RegisterKnowledgeBase()
+    def GetData(self):
+        response = requests.get(self.el_endpoint+'/elapi/v1/devices/' + self.el_id+'/properties')
+        self.el_data = json.loads(response.text)
+        asd=123
     def RegisterKnowledgeBase(self):
-        register_knowledge_base(self.kb_id, self.kb_name, self.kb_description, self.ke_endpoint)
+        register_knowledge_base(self.kb_id, self.kb_name,
+                                self.kb_description, self.ke_endpoint)
 
         data = EchonetLITEDeviceType.GetGraphByType(self.type)
         self.ki_id = register_post_knowledge_interaction(
@@ -65,44 +93,45 @@ class EchonetLITEDevice:
                 "saref": "https://saref.etsi.org/core/",
             },
         )
-        #handler = self.MySendingThread
-        #handler.join()
+        # handler = self.MySendingThread
+        # handler.join()
         x = threading.Thread(target=self.MySendingThread)
         x.start()
-        #x.join()
+        # x.join()
 
-    
     def MySendingThread(self):
         while True:
-            #print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", type)
+            # print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", type)
             self.TryToSendData()
             time.sleep(2)
 
     def TryToSendData(self):
-       
+        if not self.isDirty: return
+
         now = datetime.now()
-        self.measurement_counter+=1
+        self.measurement_counter += 1
         value = generate_random_temperature(80, 100)
         if self.type == EchonetLITEDeviceType.TEMPERATURE_SENSOR:
             data = {
-                    "sensor": f"<https://example.org/sensor/1>",
-                    "measurement": f"<https://example.org/sensor/1/measurement/{self.measurement_counter}>",
-                    "temperature": f"{value}",
-                    "timestamp": f'"{now.isoformat()}"',
-                }
+                "sensor": f"<https://example.org/sensor/1>",
+                "measurement": f"<https://example.org/sensor/1/measurement/{self.measurement_counter}>",
+                "temperature": f"{value}",
+                "timestamp": f'"{now.isoformat()}"',
+            }
         elif self.type == EchonetLITEDeviceType.WASHING_MACHINE:
             data = {
-                    "esa": "<https://example.org/washingmachine/1>",
-                    "commodity": "<https://example.org/commodity/electric>",
-                    "monitoring_of_power_consumption": f"<https://example.org/sensor/1/measurement/{self.measurement_counter}>",
-                    "power": f"<https://example.org/power/123>",
-                    "unit": f'"watt"',
-                    "value": f"{value}",
-                }
-        else: print("Error")
-        
+                "esa": "<https://example.org/washingmachine/1>",
+                "commodity": "<https://example.org/commodity/electric>",
+                "monitoring_of_power_consumption": f"<https://example.org/sensor/1/measurement/{self.measurement_counter}>",
+                "power": f"<https://example.org/power/123>",
+                "unit": f'"watt"',
+                "value": f"{value}",
+            }
+        else:
+            print("Error")
+
         now = datetime.now()
-       
+
         post(
             [
                 data
@@ -111,5 +140,4 @@ class EchonetLITEDevice:
             self.kb_id,
             self.ke_endpoint,
         )
-        print("Sending data (",(datetime.now()-now).seconds  ,"seconds):",data )
-
+        print("Sending data (", (datetime.now()-now).seconds, "seconds):", data)

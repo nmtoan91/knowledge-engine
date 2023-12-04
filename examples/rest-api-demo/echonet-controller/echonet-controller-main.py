@@ -6,6 +6,8 @@ import random
 from utils_echonet_controller import *
 from EchonetLITEDevice import EchonetLITEDeviceType,EchonetLITEDevice
 from datetime import datetime
+from EchonetLITEDeviceManager import EchonetLITEDeviceManager
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -100,25 +102,6 @@ def start_sensor_kb(kb_id, kb_name, kb_description, ke_endpoint):
 
         time.sleep(2)
 
-def Start(ke_endpoint):
-    devices = {}
-    device = EchonetLITEDevice(EchonetLITEDeviceType.TEMPERATURE_SENSOR,
-                               "http://example.org/sensor" + str(random.randint(0,10000)),
-                               "Sensor",
-                               "A temperature sensor",
-                                 ke_endpoint      )
-    devices[device.kb_id] = device
-
-    device = EchonetLITEDevice(EchonetLITEDeviceType.WASHING_MACHINE,
-                               "http://example.org/washingmachine" + str(random.randint(0,10000)),
-                               "Washingmachine",
-                               "A Washingmachine sensor",
-                                 ke_endpoint      )
-    devices[device.kb_id] = device
-
-    
-    while True:
-        time.sleep(2)
 
 if __name__ == "__main__":
     random.seed(datetime.now().timestamp())
@@ -126,9 +109,12 @@ if __name__ == "__main__":
     isUsingClass = True
 
     if isUsingClass:
-        Start(
-            "http://150.65.230.93:8280/rest/"
-        )
+        # Start(
+        #     "http://150.65.230.93:8280/rest/"
+        # )
+        echonetLITEDeviceManager = EchonetLITEDeviceManager("http://150.65.230.93:8280/rest/")
+        #echonetLITEDeviceManager.AddTestDevices()
+        echonetLITEDeviceManager.StartLoop()
     else:
         start_sensor_kb(
             #"http://example.org/washingmachine/mc1"+ str(random.randint(0,10000)),
