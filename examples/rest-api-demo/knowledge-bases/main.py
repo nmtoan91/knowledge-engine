@@ -6,107 +6,46 @@ from datetime import datetime
 import time
 import threading 
 import time
-mainView = MainView("My tkinter thread", 1000)
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from KnowledgeEngineManager import EnergyUseCase, EnergyUseCaseType
 import threading
 from concurrent.futures import Future
 
-def present_measurement(binding: dict[str, str],requestingKnowledgeBaseId, historical: bool = False):
-    s = "data="
-    for key, value in binding.items() :
-        s += f"{key}:{value}  "
-    print(s)
 
-    mainView.RevieveData(binding,requestingKnowledgeBaseId)
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
-def handle_react_measurements(bindings,requestingKnowledgeBaseId):
-    now = datetime.now()
-    for binding in bindings:
-        present_measurement(binding,requestingKnowledgeBaseId)
-    print("end receving: ", (datetime.now() - now).seconds,"seconds")
-    return []
+class Manager:
+    def __init__(self,kb_id,ke_endpoint ):
+        self.kb_id = kb_id
+        self.ke_endpoint = ke_endpoint
+        self.mainView = MainView("My tkinter thread", 1000)
 
-def my_loop(react_measurements_ki,kb_id,ke_endpoint):
-    start_handle_loop(
-        {
-            react_measurements_ki: handle_react_measurements,
-        },
-        kb_id,
-        ke_endpoint,
-    )
+    def Start(self):
+        self.RegisterReacts()
+        self.mainView.RunOnMainThread()
 
-def start_ui_kb(kb_id, kb_name, kb_description, ke_endpoint):
-    #Sensor
-    register_knowledge_base(kb_id, kb_name, kb_description, ke_endpoint)
-    react_measurements_ki = register_react_knowledge_interaction(
-        """
-            ?sensor rdf:type saref:Sensor .
-            ?measurement saref:measurementMadeBy ?sensor .
-            ?measurement saref:isMeasuredIn saref:TemperatureUnit .
-            ?measurement saref:hasValue ?temperature .
-            ?measurement saref:hasTimestamp ?timestamp .
-        """,
-        None,
-        "react-measurements",
-        kb_id,
-        ke_endpoint,
-        {
-            "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-            "saref": "https://saref.etsi.org/core/",
-        },
-    )
-    kb_id2 = kb_id+str(2)
-    register_knowledge_base(kb_id2, kb_name, kb_description, ke_endpoint)
-    react_measurements_ki2 = register_react_knowledge_interaction(
-        """
-            ?esa rdf:type saref:Device .
-            ?esa saref:isUsedFor ?commodity .
-            ?commodity rdf:type saref:Electricity .
-            ?esa saref:makesMeasurement ?monitoring_of_power_consumption .
-            ?monitoring_of_power_consumption saref:relatesToProperty ?power .
-            ?power rdf:type saref:Power .
-            ?monitoring_of_power_consumption saref:isMeasuredIn ?unit .
-            ?monitoring_of_power_consumption saref:hasValue ?value .
-        """,
-        None,
-        "react-measurements",
-        kb_id2,
-        ke_endpoint,
-        {
-            "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-            "saref": "https://saref.etsi.org/core/",
-        },
-    )
+    def RegisterReacts(self):
+        self.energyCases = {}
+        self.energyCases[EnergyUseCaseType.FLEXIBLE_START] =  EnergyUseCase(EnergyUseCaseType.FLEXIBLE_START,self)
+        # self.energyCases[EnergyUseCaseType.MONITORING_POWER_CONSUMPTION] =  EnergyUseCase(EnergyUseCaseType.MONITORING_POWER_CONSUMPTION,self)
+        # self.energyCases[EnergyUseCaseType.LIMITATION_POWER_CONSUMPTION] =  EnergyUseCase(EnergyUseCaseType.LIMITATION_POWER_CONSUMPTION,self)
+        # self.energyCases[EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_INCENTIVE_TABLE] =  EnergyUseCase(EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_INCENTIVE_TABLE,self)
+        # self.energyCases[EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN] =  EnergyUseCase(EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN,self)
+        # self.energyCases[EnergyUseCaseType.MANUAL_OPERATION] =  EnergyUseCase(EnergyUseCaseType.MANUAL_OPERATION,self)
 
-
-    x = threading.Thread(target=my_loop, args=(react_measurements_ki,kb_id,ke_endpoint))
-    x.start()
-    x2 = threading.Thread(target=my_loop, args=(react_measurements_ki2,kb_id2,ke_endpoint))
-    x2.start()
-    while True:
-        time.sleep(1)
+        for key in self.energyCases:
+            self.energyCases[key].RegisterKnowledgeBaseReact()
 
 
 
-class KBInThread(threading.Thread):
-    def run(self):
-        time.sleep(1)
-        print('start_ui_kb')
-        start_ui_kb(
-            "http://example.org/ui3" + str(random.random()) ,
-            "UI",
-            "UI for measurement",
-            "http://150.65.230.93:8280/rest/",
-        )
+
 
 if __name__ == "__main__":
     random.seed(datetime.now().timestamp())
     add_sigterm_hook()
-
-    kbInThread = KBInThread()
-    kbInThread.start()
-    mainView.RunOnMainThread()
+    manager = Manager("http://example.org/ui3" + str(random.random()), 
+                  "http://150.65.230.93:8280/rest/"    )
+    manager.Start()
+    
 

@@ -20,11 +20,11 @@ class EnergyUseCaseType(Enum):
 
     
 class EnergyUseCase:
-    def __init__(self,type:EnergyUseCaseType,echonetLITEDeviceManager):
-        self.echonetLITEDeviceManager = echonetLITEDeviceManager
+    def __init__(self,type:EnergyUseCaseType,manager):
+        self.manager = manager
         self.type = type
         self.kb_id = "http://jaist.org/devicees_" + str(type)+ str(random.randint(0,10000))
-        self.kb_name = "EchonetLITEDeviceManager_" + str(type)
+        self.kb_name = "UIManager_" + str(type)
         self.kb_description = "An EchonetLITE Device Manager: " + str(type)
 
         # if self.type == EnergyUseCaseType.FLEXIBLE_START:
@@ -229,21 +229,21 @@ class EnergyUseCase:
             ],
             self.ki_id,
             self.kb_id,
-            self.echonetLITEDeviceManager.ke_endpoint,
+            self.manager.ke_endpoint,
         )
         print("\nSending data (", (datetime.now()-now).seconds, "seconds):", data)
 
-    def RegisterKnowledgeBase(self):
+    def RegisterKnowledgeBaseReact(self):
         print("\n\nRegistering", self.type)
         register_knowledge_base(self.kb_id, self.kb_name,
-                                self.kb_description, self.echonetLITEDeviceManager.ke_endpoint)
+                                self.kb_description, self.manager.ke_endpoint)
         
-        self.ki_id = register_post_knowledge_interaction(
+        self.ki_id = register_react_knowledge_interaction(
             self.GetGraphByType(),
             None,
-            "post-measurements",
+            "react-measurements",
             self.kb_id,
-            self.echonetLITEDeviceManager.ke_endpoint,
+            self.manager.ke_endpoint,
             {
                 "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
                 "saref": "https://saref.etsi.org/core/",
@@ -253,4 +253,30 @@ class EnergyUseCase:
                 "time": "https://saref.etsi.org/core4/",
             },
         )
+        x = threading.Thread(target=self.my_react_loop, args=())
+        x.start()
+
+    def present_measurement(self,binding: dict[str, str],requestingKnowledgeBaseId, historical: bool = False):
+        s = "data="
+        for key, value in binding.items() :
+            s += f"{key}:{value}  "
+        print(s)
+
+        #mainView.RevieveData(binding,requestingKnowledgeBaseId)
+
+
+    def handle_react_measurements(self,bindings,requestingKnowledgeBaseId):
+        now = datetime.now()
+        for binding in bindings:
+            self.present_measurement(binding,requestingKnowledgeBaseId)
+        print("end receving: ", (datetime.now() - now).seconds,"seconds")
+        return []
+    def my_react_loop(self):
+        start_handle_loop(
+        {
+            self.ki_id: self.handle_react_measurements,
+        },
+        self.kb_id,
+        self.manager.ke_endpoint,
+    )
 
