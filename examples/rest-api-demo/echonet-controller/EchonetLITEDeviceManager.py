@@ -393,7 +393,7 @@ class EchonetLITEDeviceManager:
                 while True:
                     time.sleep(1)
             except KeyboardInterrupt:
-                print("\n\n\n\n STOP \n\n\n")
+                print("\n\n\n\n STOPPING, PLEASE WAIT !!! \n\n\n")
                 self.isShutDown = True
 
 
