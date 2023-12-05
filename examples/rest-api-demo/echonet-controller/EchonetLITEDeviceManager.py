@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 import time
 import random
@@ -275,27 +276,25 @@ class EnergyUseCase:
     def HandlingAsnwerThread(self):
         start_handle_loop(
         {
-            self.ki_id_answer: self.handle_answer_measurements,
+            self.ki_id_answer: self.Answer,
         },
         self.kb_id_answer,
         self.echonetLITEDeviceManager.ke_endpoint,)
-    def handle_answer_measurements(self,bindings):
-        
+    def Answer(self,bindings):
+        self.echonetLITEDeviceManager.Answer(bindings)
         # for binding in bindings:
         #     present_measurement(binding)
-
-        KB_DATA = [{
-                        "sensor": "<https://example.org/sensor/askingsensor>",
-                        "measurement": f"<https://example.org/sensor/1/measurement/{59}>",
-                        "temperature": f"{156}",
-                        "timestamp": f'"{datetime.now().isoformat()}"',
-                    }]
+        print(f"\n\n\n\n\n Answering a ask with data=\n{bindings} \n\n")
+        return []
+        KB_DATA = json.loads(os.getenv("KB_DATA"))
         data = match_bindings(
                 bindings,
                 KB_DATA,
             )
-        data = bindings
+        print("\n\nKB=", KB_DATA,"\n\n")
+        #data = bindings
         print(f"\n\n\n\n\n Answering a ask with data=\n{data} \n\n")
+        return data
         return data#KB_DATA#bindings
 
 
@@ -337,6 +336,7 @@ class EchonetLITEDeviceManager:
                                 desc,
                                     self.ke_endpoint ,self.el_endpoint, key ,self    )
                 self.devices[device.kb_id] = device
+                print(f"\n\n\n\n Adding device: {device.kb_id}\n\n\n\n")
                 break #test only
             
         asd=123
@@ -371,6 +371,15 @@ class EchonetLITEDeviceManager:
         if isLoop:
             while True:
                 time.sleep(2)
+
+    def Answer(self,bindings):
+        for binding in bindings:
+            if 'esa' in binding:
+                key = binding['esa']
+                if key in  self.devices:
+                    self.devices[key].Answer(binding)
+                else : print(f"\n\n\n\n[ERROR HERE] Cannot find device with the key {key} \n\n\n\n")
+            else: print("\n\n\n\n[ERROR HERE] the key esa is not existed \n\n\n\n")
 
 if __name__ == '__main__':
     echonetLITEDeviceManager = EchonetLITEDeviceManager("http://150.65.230.93:8280/rest/")

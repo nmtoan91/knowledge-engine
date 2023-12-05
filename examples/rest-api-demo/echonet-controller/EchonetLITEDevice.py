@@ -37,37 +37,6 @@ class EchonetLITEDeviceType(Enum):
     BATHROOM_HEATER_DRYER = 'bathroomHeaterDryer'
     VENTILATION_FAN = 'ventilationFan'
 
-    # def GetGraphByType(type):
-    #     if type == EchonetLITEDeviceType.TEMPERATURE_SENSOR:
-    #         return """
-    #                     ?sensor rdf:type saref:Sensor .
-    #                     ?measurement saref:measurementMadeBy ?sensor .
-    #                     ?measurement saref:isMeasuredIn saref:TemperatureUnit .
-    #                     ?measurement saref:hasValue ?temperature .
-    #                     ?measurement saref:hasTimestamp ?timestamp .
-    #                 """
-
-    #     if type == EchonetLITEDeviceType.WASHING_MACHINE:
-    #         return """
-    #                     ?esa rdf:type saref:Device .
-    #                     ?esa saref:isUsedFor ?commodity .
-    #                     ?commodity rdf:type saref:Electricity .
-    #                     ?esa saref:makesMeasurement ?monitoring_of_power_consumption .
-    #                     ?monitoring_of_power_consumption saref:relatesToProperty ?power .
-    #                     ?power rdf:type saref:Power .
-    #                     ?monitoring_of_power_consumption saref:isMeasuredIn ?unit .
-    #                     ?monitoring_of_power_consumption saref:hasValue ?value .
-    #                 """
-        
-    #     print ("[Error] Cannot find graph defines")
-    #     return """
-    #                     ?sensor rdf:type saref:Sensor .
-    #                     ?measurement saref:measurementMadeBy ?sensor .
-    #                     ?measurement saref:isMeasuredIn saref:TemperatureUnit .
-    #                     ?measurement saref:hasValue ?temperature .
-    #                     ?measurement saref:hasTimestamp ?timestamp .
-    #                 """
-
 class EchonetLITEDevice:
     def __init__(self, type: EchonetLITEDeviceType, kb_id, kb_name, kb_description, ke_endpoint,el_endpoint,el_id,echonetLITEDeviceManager):
         self.el_id = el_id
@@ -84,17 +53,35 @@ class EchonetLITEDevice:
         #self.GetData()
         x = threading.Thread(target=self.GetDataThread, args=())
         x.start()
+
+        self.property_earliestStartTime = datetime.now().isoformat()
+        self.property_latestEndTime = datetime.now().isoformat()
+        self.property_startTime = datetime.now().isoformat()
+        self.property_endTime = datetime.now().isoformat()
+        self.property_powerSequenceState = "s4ener:Inactive"
     def GetDataThread(self):
         while True:
             self.GetData()   
             time.sleep(2)
+    def Answer(self,bindings):
+        if 'earliestStartTime' in bindings:
+            self.property_earliestStartTime = bindings['earliestStartTime']
+        if 'latestEndTime' in bindings:
+            self.property_latestEndTime = bindings['latestEndTime']
+        if 'startTime' in bindings:
+            self.property_startTime = bindings['startTime']
+        if 'endTime' in bindings:
+            self.property_endTime = bindings['endTime']
+        if 'powerSequenceState' in bindings:
+            self.property_powerSequenceState = bindings['powerSequenceState']
+        
         #self.StartSendingThread()
     def GetData(self):
         sotangdan =1
         response = requests.get(self.el_endpoint+'/elapi/v1/devices/' + self.el_id+'/properties')
         self.el_data =data = json.loads(response.text)
         prefix = "http://jaist.ac.com/"
-        esa = prefix+"esa"+self.el_id
+        esa = self.kb_id#prefix+"esa"+self.el_id
         commodity = prefix+"commodity" + self.el_id
         commodityProperty = prefix+"commodityProperty"+ self.el_id
         power= prefix + "power" +  self.el_id
@@ -105,13 +92,14 @@ class EchonetLITEDevice:
         alternativesID = "echonet" +  self.el_id
         powerSequence = prefix + "powerSequence" + self.el_id
         sequenceID= powerSequence + str(sotangdan)
-        powerSequenceState = "s4ener:"+"Inactive"  #Important  Scheduled, Inactive, Invalid, Running, Paused, SchduledPaused, Pending, Completed
+        powerSequenceState = self.property_powerSequenceState  #Important  Scheduled, Inactive, Invalid, Running, Paused, SchduledPaused, Pending, Completed
         activeSlotNumber = 1
         sequenceRemoteControllable = "True"
-        startTime= "2023-12-04 15:23:12"
-        endTime = "2023-12-04 15:23:12"
-        earliestStartTime = "2023-12-04 15:23:12"
-        latestEndTime= "2023-12-04 15:23:12"
+
+        startTime=  self.property_startTime
+        endTime = self.property_endTime
+        earliestStartTime = self.property_earliestStartTime
+        latestEndTime= self.property_latestEndTime
         isPausable= "False"
         isStoppable= "True"
         valueSource= "s4ener:"+"Measured" # Calculated, Empirical
@@ -124,9 +112,9 @@ class EchonetLITEDevice:
         #IMPORTANT
         powerSequenceSlotValue= data['instantaneousElectricPowerConsumption']
         data_FLEXIBLE_START = {
-            "esa": f"<https://example.org/power/{esa}>",
-            "commodity": f"<https://example.org/commodity/{commodity}>",
-            "commodityProperty": f"<https://example.org/commodity/{commodityProperty}>",
+            "esa": f"{esa}",
+            "commodity": f"{commodity}",
+            "commodityProperty": f"{commodityProperty}",
             "power": f"{power}",
             "powerProfile": f"{powerProfile}",
             "nodeRemoteControllable": f"{nodeRemoteControllable}",

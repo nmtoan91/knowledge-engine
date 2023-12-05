@@ -22,6 +22,11 @@ class DeviceView(tk.Frame):
     
 
     def __init__(self,root, id, deviceType: DeviceType,manager):
+        self.property_valueSource  = "N/A"
+        self.property_powerSequenceState  = "N/A"
+        self.property_powerSequenceSlotPowerType  = "N/A"
+
+        self.prefix = "http://"
         self.manager = manager
         self.deviceType = deviceType
         if deviceType == DeviceType.WASHING_MACHINE:
@@ -95,7 +100,7 @@ class DeviceView(tk.Frame):
 
        
 
-        self.button_flexible_stop = tk.Button(frame_flexible, text="Stop", fg="black", command=self.flexible_stop_click)
+        self.button_flexible_stop = tk.Button(frame_flexible, text="N/A", fg="black", command=self.flexible_stop_click)
         self.button_flexible_stop.grid( row=0,column=1, sticky=tk.W)
 
         self.button_flexible_apply = tk.Button(frame_flexible, text="Apply", fg="black", command=self.flexible_apply_click)
@@ -112,7 +117,7 @@ class DeviceView(tk.Frame):
 
         #latestEndTime
         label = tk.Label(frame_flexible,text="Latest End Time: ",bg='lavender')
-        label.grid( row=2,column=0, sticky=tk.N)
+        label.grid( row=2,column=0, sticky=tk.E)
 
         self.text_flexible_latestEndTime = tk.Text(frame_flexible,height = 1.4, width = 20)
         self.text_flexible_latestEndTime.grid( row=2,column=1, sticky=tk.N)
@@ -121,25 +126,27 @@ class DeviceView(tk.Frame):
         label = tk.Label(frame_flexible,text="Start Time: ",bg='lavender')
         label.grid( row=3,column=0, sticky=tk.E)
 
-        self.text_flexible_startTime = tk.Text(frame_flexible,height = 1.4, width = 20,bg='lavender')
+        self.text_flexible_startTime = tk.Text(frame_flexible,height = 1.4, width = 20)#,bg='lavender')
         self.text_flexible_startTime.grid( row=3,column=1, sticky=tk.N)
         #self.text_flexible_startTime.configure(state='disabled')
         #endTime
         label = tk.Label(frame_flexible,text="End Time: ",bg='lavender')
         label.grid( row=4,column=0, sticky=tk.E)
 
-        self.text_flexible_endTime = tk.Text(frame_flexible,height = 1.4, width = 20,bg='lavender')
+        self.text_flexible_endTime = tk.Text(frame_flexible,height = 1.4, width = 20)#,bg='lavender')
         self.text_flexible_endTime.grid( row=4,column=1, sticky=tk.N)
-        #self.text_flexible_endTime.configure(state='disabled')
+        
 
+        self.label_flexible_valueSource = tk.Label(frame_flexible,text="valueSource: " + self.property_valueSource,bg='lavender')
+        self.label_flexible_valueSource.grid( row=5,column=0, sticky=tk.W)
 
+        self.label_flexible_powerSequenceState = tk.Label(frame_flexible,text="powerSequenceState: " + self.property_powerSequenceState,bg='lavender')
+        self.label_flexible_powerSequenceState.grid( row=5,column=1, sticky=tk.W)
 
-        # label = tk.Label(frame_flexible,text="Flexible\nPause",bg='lavender')
-        # label.pack(side=tk.LEFT)
+        self.label_flexible_powerSequenceSlotPowerType = tk.Label(frame_flexible,text="powerSequenceSlotPowerType: "+ self.property_powerSequenceSlotPowerType,bg='lavender')
+        self.label_flexible_powerSequenceSlotPowerType.grid( row=6,column=1, sticky=tk.W)
 
-        # self.button_flexible_pause = tk.Button(frame_flexible, text="Pause", fg="black", command=self.flexible_pause_click)
-        # self.button_flexible_pause.pack(side=tk.LEFT)
-
+        
 
         
     def ReceiveData(self,data,requestingKnowledgeBaseId,energyUseCaseType):
@@ -157,16 +164,24 @@ class DeviceView(tk.Frame):
             if 'latestEndTime' in data and self.text_flexible_latestEndTime.get("1.0","end") =='\n': 
                 self.text_flexible_latestEndTime.delete(1.0, "end")
                 self.text_flexible_latestEndTime.insert(1.0, data['latestEndTime'])
-            if 'startTime' in data:
-                self.text_flexible_startTime.configure(state='normal')
+            if 'startTime' in data and self.text_flexible_startTime.get("1.0","end") =='\n':
+                #self.text_flexible_startTime.configure(state='normal')
                 self.text_flexible_startTime.delete(1.0, "end")
                 self.text_flexible_startTime.insert(1.0, data['startTime'])
-                self.text_flexible_startTime.configure(state='disabled')
-            if 'endTime' in data:
-                self.text_flexible_endTime.configure(state='normal')
+                #self.text_flexible_startTime.configure(state='disabled')
+            if 'endTime' in data and self.text_flexible_endTime.get("1.0","end") =='\n':
                 self.text_flexible_endTime.delete(1.0, "end")
                 self.text_flexible_endTime.insert(1.0, data['endTime'])
-                self.text_flexible_endTime.configure(state='disabled')
+            if 'powerSequenceState' in data:
+                self.property_powerSequenceState = data['powerSequenceState']
+                self.label_flexible_powerSequenceState.config(text=self.property_powerSequenceState)
+            if 'valueSource' in data:
+                self.property_valueSource = data['valueSource']
+                self.label_flexible_valueSource.config(text=self.property_valueSource)
+            if 'powerSequenceSlotPowerType' in data:
+                self.property_powerSequenceSlotPowerType = data['powerSequenceSlotPowerType']
+                self.label_flexible_powerSequenceSlotPowerType.config(text=self.property_powerSequenceSlotPowerType)
+                
 
         else: print("Error here")
 
@@ -211,9 +226,18 @@ class DeviceView(tk.Frame):
         self.manager.Ask(EnergyUseCaseType.FLEXIBLE_START, 
                          {
             "esa": self.data['esa'],
-            "earliestStartTime": data_earliestStartTime,
+            #"powerProfile": self.data['powerProfile'],
+            #"alternativesgroup": self.data['alternativesgroup'],
+            #"powerSequence": self.data['powerSequence'],
+            #"earliestStartTime": self.prefix + data_earliestStartTime,
+            #"latestEndTime": self.prefix + data_latestEndTime,
+            "earliestStartTime":  data_earliestStartTime,
             "latestEndTime": data_latestEndTime,
         } )
+        self.text_flexible_earliestStartTime.delete(1.0, "end")
+        self.text_flexible_latestEndTime.delete(1.0, "end")
+        self.text_flexible_startTime.delete(1.0, "end")
+        self.text_flexible_endTime.delete(1.0, "end")
         
 
     def flexible_pause_click(self):
