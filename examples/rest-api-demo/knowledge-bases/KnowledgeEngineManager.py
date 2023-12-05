@@ -238,7 +238,8 @@ class EnergyUseCase:
         response = requests.delete(
              f"{self.manager.ke_endpoint}/sc", headers={"Knowledge-Base-Id": self.kb_id}
          )
-        assert response.ok, response.text
+        if response.ok == False:
+            print("\n\n\n Error AT:",response.text ,"\n\n\n")
     def RegisterKnowledgeBaseReact(self):
         print("\n\nRegistering (REACT)", self.type)
         register_knowledge_base(self.kb_id, self.kb_name,
@@ -265,7 +266,8 @@ class EnergyUseCase:
         response = requests.delete(
              f"{self.manager.ke_endpoint}/sc", headers={"Knowledge-Base-Id": self.kb_id_ask}
          )
-        assert response.ok, response.text
+        if response.ok == False:
+            print("\n\n\n Error AT:",response.text ,"\n\n\n")
     def RegisterKnowledgeBaseAsk(self):
         print("\n\nRegistering (ASK", self.type)
         register_knowledge_base(self.kb_id_ask, self.kb_name,

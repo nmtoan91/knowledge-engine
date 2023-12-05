@@ -69,7 +69,7 @@ class Manager:
 
 def exit_handler():
     print (f'\n\n\n\n\n My application is ending! {Manager.instance.energyCases} \n\n\n\n\n')
-
+    Manager.instance.UnRegister()
 
 if __name__ == "__main__":
     atexit.register(exit_handler)

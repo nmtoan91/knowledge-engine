@@ -53,6 +53,7 @@ class EchonetLITEDevice:
         #self.GetData()
         x = threading.Thread(target=self.GetDataThread, args=())
         x.start()
+        #x.join()
 
         self.property_earliestStartTime = datetime.now().isoformat()
         self.property_latestEndTime = datetime.now().isoformat()
@@ -63,6 +64,9 @@ class EchonetLITEDevice:
         while True:
             self.GetData()   
             time.sleep(2)
+            if self.echonetLITEDeviceManager.isShutDown:
+                break
+                
     def Answer(self,bindings):
         if 'earliestStartTime' in bindings:
             self.property_earliestStartTime = bindings['earliestStartTime']

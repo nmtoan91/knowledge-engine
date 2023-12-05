@@ -11,7 +11,7 @@ from concurrent.futures import Future
 from EchonetLITEDevice import EchonetLITEDevice,EnergyUseCaseType
 from EchonetLITEDevice import EchonetLITEDeviceType
 import json
-
+import atexit
 
 
     
@@ -216,7 +216,11 @@ class EnergyUseCase:
         return None
     def SendData(self,data):
         x = threading.Thread(target=self.SendDataThread, args=(data,))
-        x.start()
+        try:
+            x.start()
+        except:
+            EchonetLITEDeviceManager.instance.isShutDown = True
+            print("Can't start new thread")
         
     def SendDataThread(self,data):
         now = datetime.now()
@@ -230,6 +234,12 @@ class EnergyUseCase:
         )
         print("\nSending data (", (datetime.now()-now).seconds, "seconds):", data)
 
+    def UnRegisterKnowledgeBasePost(self):
+        response = requests.delete(
+             f"{self.manager.ke_endpoint}/sc", headers={"Knowledge-Base-Id": self.kb_id}
+         )
+        if response.ok == False:
+            print("\n\n\n Error AT:",response.text ,"\n\n\n")
     def RegisterKnowledgeBasePost(self):
         print("\n\nRegistering (Post)", self.type)
         register_knowledge_base(self.kb_id, self.kb_name,
@@ -250,6 +260,12 @@ class EnergyUseCase:
                 "time": "https://saref.etsi.org/core4/",
             },
         )
+    def UnRegisterKnowledgeBaseAnswer(self):
+        response = requests.delete(
+             f"{self.manager.ke_endpoint}/sc", headers={"Knowledge-Base-Id": self.kb_id_answer}
+         )
+        if response.ok == False:
+            print("\n\n\n Error AT:",response.text ,"\n\n\n")
     def RegisterKnowledgeBaseAnswer(self):
         print("\n\nRegistering (Answer)", self.type)
         register_knowledge_base(self.kb_id_answer, self.kb_name,
@@ -301,7 +317,10 @@ class EnergyUseCase:
 
 
 class EchonetLITEDeviceManager:
+    instance = None
     def __init__(self,ke_endpoint):
+        self.isShutDown = False
+        EchonetLITEDeviceManager.instance = self
         self.devices = {}
         self.ke_endpoint= ke_endpoint
         self.el_endpoint = "http://150.65.231.106:6000"
@@ -367,9 +386,11 @@ class EchonetLITEDeviceManager:
     def StartLoop(self,isLoop=True):
         self.RegisterGraphs()
         self.GetInforFromEchonetLITEServer()
-        
+        #isLoop = False
         if isLoop:
             while True:
+                #print('mainloop')
+                if self.isShutDown: break
                 time.sleep(2)
 
     def Answer(self,bindings):
@@ -380,6 +401,12 @@ class EchonetLITEDeviceManager:
                     self.devices[key].Answer(binding)
                 else : print(f"\n\n\n\n[ERROR HERE] Cannot find device with the key {key} \n\n\n\n")
             else: print("\n\n\n\n[ERROR HERE] the key esa is not existed \n\n\n\n")
+
+    def UnRegister(self):
+        self.isShutDown = True
+        for key in self.energyCases:
+            self.energyCases[key].UnRegisterKnowledgeBasePost()
+            self.energyCases[key].UnRegisterKnowledgeBaseAnswer()
 
 if __name__ == '__main__':
     echonetLITEDeviceManager = EchonetLITEDeviceManager("http://150.65.230.93:8280/rest/")

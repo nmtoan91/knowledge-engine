@@ -7,7 +7,7 @@ from utils_echonet_controller import *
 from EchonetLITEDevice import EchonetLITEDeviceType,EchonetLITEDevice
 from datetime import datetime
 from EchonetLITEDeviceManager import EchonetLITEDeviceManager
-
+import atexit
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -102,8 +102,11 @@ def start_sensor_kb(kb_id, kb_name, kb_description, ke_endpoint):
 
         time.sleep(2)
 
-
+def exit_handler():
+    print (f'\n\n\n\n\n My application is ending! {EchonetLITEDeviceManager.instance.energyCases} \n\n\n\n\n')
+    EchonetLITEDeviceManager.instance.UnRegister()
 if __name__ == "__main__":
+    atexit.register(exit_handler)
     random.seed(datetime.now().timestamp())
     add_sigterm_hook()
     isUsingClass = True
