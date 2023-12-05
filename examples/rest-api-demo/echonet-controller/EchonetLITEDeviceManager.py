@@ -19,6 +19,7 @@ class EnergyUseCase:
         self.echonetLITEDeviceManager = echonetLITEDeviceManager
         self.type = type
         self.kb_id = "http://jaist.org/devicees_" + str(type)+ str(random.randint(0,10000))
+        self.kb_id_answer = self.kb_id + "_answer"
         self.kb_name = "EchonetLITEDeviceManager_" + str(type)
         self.kb_description = "An EchonetLITE Device Manager: " + str(type)
 
@@ -228,8 +229,8 @@ class EnergyUseCase:
         )
         print("\nSending data (", (datetime.now()-now).seconds, "seconds):", data)
 
-    def RegisterKnowledgeBase(self):
-        print("\n\nRegistering", self.type)
+    def RegisterKnowledgeBasePost(self):
+        print("\n\nRegistering (Post)", self.type)
         register_knowledge_base(self.kb_id, self.kb_name,
                                 self.kb_description, self.echonetLITEDeviceManager.ke_endpoint)
         
@@ -248,6 +249,54 @@ class EnergyUseCase:
                 "time": "https://saref.etsi.org/core4/",
             },
         )
+    def RegisterKnowledgeBaseAnswer(self):
+        print("\n\nRegistering (Answer)", self.type)
+        register_knowledge_base(self.kb_id_answer, self.kb_name,
+                                self.kb_description, self.echonetLITEDeviceManager.ke_endpoint)
+        
+        self.ki_id_answer = register_answer_knowledge_interaction(
+            self.GetGraphByType(),
+            #None,
+            "post-measurements",
+            self.kb_id_answer,
+            self.echonetLITEDeviceManager.ke_endpoint,
+            {
+                "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                "saref": "https://saref.etsi.org/core/",
+                "s4ener": "https://saref.etsi.org/core1/",
+                "om": "https://saref.etsi.org/core2/",
+                "saref4ener": "https://saref.etsi.org/core3/",
+                "time": "https://saref.etsi.org/core4/",
+            },
+        )
+        x = threading.Thread(target=self.HandlingAsnwerThread, args=())
+        x.start()
+        
+    def HandlingAsnwerThread(self):
+        start_handle_loop(
+        {
+            self.ki_id_answer: self.handle_answer_measurements,
+        },
+        self.kb_id_answer,
+        self.echonetLITEDeviceManager.ke_endpoint,)
+    def handle_answer_measurements(self,bindings):
+        
+        # for binding in bindings:
+        #     present_measurement(binding)
+
+        KB_DATA = [{
+                        "sensor": "<https://example.org/sensor/askingsensor>",
+                        "measurement": f"<https://example.org/sensor/1/measurement/{59}>",
+                        "temperature": f"{156}",
+                        "timestamp": f'"{datetime.now().isoformat()}"',
+                    }]
+        data = match_bindings(
+                bindings,
+                KB_DATA,
+            )
+        data = bindings
+        print(f"\n\n\n\n\n Answering a ask with data=\n{data} \n\n")
+        return data#KB_DATA#bindings
 
 
 
@@ -304,7 +353,9 @@ class EchonetLITEDeviceManager:
 
 
         for key in self.energyCases:
-            self.energyCases[key].RegisterKnowledgeBase()
+            self.energyCases[key].RegisterKnowledgeBasePost()
+            self.energyCases[key].RegisterKnowledgeBaseAnswer()
+            
         self.initialized = True
 
     def SendMultipleData(self,multipleData):
