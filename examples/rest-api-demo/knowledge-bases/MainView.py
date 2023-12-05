@@ -6,7 +6,8 @@ from DeviceView import DeviceView
 from DeviceView import DeviceType
 
 class MainView(threading.Thread):
-    def __init__(self, thread_name, thread_ID): 
+    def __init__(self, thread_name, thread_ID,manager): 
+        self.manager = manager
         threading.Thread.__init__(self) 
         self.thread_name = thread_name 
         self.thread_ID = thread_ID 
@@ -29,6 +30,7 @@ class MainView(threading.Thread):
     def RunOnMainThread(self):
         self.run()
     def ReceiveData(self, data,requestingKnowledgeBaseId,energyUseCaseType):
+        if not hasattr(self,'devices'):  return
         if requestingKnowledgeBaseId in self.devices:
              self.devices[requestingKnowledgeBaseId].ReceiveData(data,requestingKnowledgeBaseId,energyUseCaseType)
         else: 
@@ -39,7 +41,7 @@ class MainView(threading.Thread):
             self.AddDevice(requestingKnowledgeBaseId,type)    
 
     def AddDevice(self, deviceId, deviceType:DeviceType):
-        frame  = DeviceView(self.root,deviceId,deviceType)
+        frame  = DeviceView(self.root,deviceId,deviceType,self.manager)
         index = len(self.devices)
         frame.frame.grid(row=index//3, column =index%3)
         self.devices[frame.id] = frame

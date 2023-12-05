@@ -24,6 +24,7 @@ class EnergyUseCase:
         self.manager = manager
         self.type = type
         self.kb_id = "http://jaist.org/devicees_" + str(type)+ str(random.randint(0,10000))
+        self.kb_id_ask = self.kb_id + "ask"
         self.kb_name = "UIManager_" + str(type)
         self.kb_description = "An EchonetLITE Device Manager: " + str(type)
 
@@ -234,7 +235,7 @@ class EnergyUseCase:
         print("\nSending data (", (datetime.now()-now).seconds, "seconds):", data)
 
     def RegisterKnowledgeBaseReact(self):
-        print("\n\nRegistering", self.type)
+        print("\n\nRegistering (REACT)", self.type)
         register_knowledge_base(self.kb_id, self.kb_name,
                                 self.kb_description, self.manager.ke_endpoint)
         
@@ -256,6 +257,26 @@ class EnergyUseCase:
         x = threading.Thread(target=self.my_react_loop, args=())
         x.start()
 
+    def RegisterKnowledgeBaseAsk(self):
+        print("\n\nRegistering (ASK", self.type)
+        register_knowledge_base(self.kb_id_ask, self.kb_name,
+                                self.kb_description, self.manager.ke_endpoint)
+        
+        self.ki_id_ask = register_ask_knowledge_interaction(
+            self.GetGraphByType(),
+            "ask-measurements",
+            self.kb_id_ask,
+            self.manager.ke_endpoint,
+            {
+                "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                "saref": "https://saref.etsi.org/core/",
+                "s4ener": "https://saref.etsi.org/core1/",
+                "om": "https://saref.etsi.org/core2/",
+                "saref4ener": "https://saref.etsi.org/core3/",
+                "time": "https://saref.etsi.org/core4/",
+            },
+        )
+
     def present_measurement(self,binding: dict[str, str],requestingKnowledgeBaseId, historical: bool = False):
         s = "data="
         for key, value in binding.items() :
@@ -272,6 +293,7 @@ class EnergyUseCase:
         print("end receving: ", (datetime.now() - now).seconds,"seconds")
         return []
     def my_react_loop(self):
+        #time.sleep(1)
         start_handle_loop(
         {
             self.ki_id: self.handle_react_measurements,
@@ -279,4 +301,19 @@ class EnergyUseCase:
         self.kb_id,
         self.manager.ke_endpoint,
     )
+    def Ask(self,structuredData):
+        x = threading.Thread(target=self.Ask_, args=(structuredData,))
+        x.start()
+    def Ask_(self,structuredData):
+        data = ask(
+            [
+                structuredData
+            ],
+            self.ki_id_ask,
+            self.kb_id_ask,
+            self.manager.ke_endpoint,
+        )
+        print("\n\n\n\n Asked and responsed: ",data,'\n\n')
+        
+
 

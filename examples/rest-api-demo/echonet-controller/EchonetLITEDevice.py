@@ -112,7 +112,7 @@ class EchonetLITEDevice:
         endTime = "2023-12-04 15:23:12"
         earliestStartTime = "2023-12-04 15:23:12"
         latestEndTime= "2023-12-04 15:23:12"
-        isPausable= "True"
+        isPausable= "False"
         isStoppable= "True"
         valueSource= "s4ener:"+"Measured" # Calculated, Empirical
         powerSequenceSlot= prefix + "powerSequenceSlot" + self.el_id

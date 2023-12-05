@@ -21,7 +21,8 @@ class DeviceType(Enum):
 class DeviceView(tk.Frame):
     
 
-    def __init__(self,root, id, deviceType: DeviceType):
+    def __init__(self,root, id, deviceType: DeviceType,manager):
+        self.manager = manager
         self.deviceType = deviceType
         if deviceType == DeviceType.WASHING_MACHINE:
             iconname = "cleaning.png"
@@ -30,7 +31,8 @@ class DeviceView(tk.Frame):
 
         self.datasample_count =0
         self.id = id
-        self.isFlexible = False
+        self.isFlexible_stop = False
+        self.isFlexible_pause = False
         self.isOperation = False
         self.data_x = []
         self.data_y = []
@@ -45,21 +47,12 @@ class DeviceView(tk.Frame):
         my_label.img = my_img  
         my_label.grid( row=0,column=0, sticky=tk.N)
 
-        frame_buttons = tk.Frame(frame,background='',width=100, height=100, pady=10,padx = 20)
-        frame_buttons.grid( row=2,column=0, sticky=tk.N)
-
-        label = tk.Label(frame_buttons,text="Flexible\nStart",bg='lavender')
-        label.pack(side=tk.LEFT)
-
-        self.button_flexible = tk.Button(frame_buttons, text="Flexible: OFF", fg="black", command=self.flexible_click)
-        self.button_flexible.pack(side=tk.RIGHT)
-
-        frame_buttons2 = tk.Frame(frame, width=100,background='', height=100, pady=10,padx = 20)
+        self.CreateFlexibleStartUI(frame)
+        frame_buttons2 = tk.Frame(frame, width=100,background='lavender', height=100, pady=10,padx = 20)
         frame_buttons2.grid( row=4,column=0, sticky=tk.N)
 
         label = tk.Label(frame_buttons2,text="Manual\nOperation",bg='lavender')
         label.pack(side=tk.LEFT)
-
 
         self.button_operation = tk.Button(frame_buttons2, text="Operation", command=self.operation_click)
         self.button_operation.pack(side=tk.RIGHT)
@@ -78,7 +71,7 @@ class DeviceView(tk.Frame):
         self.scatter = FigureCanvasTkAgg(self.fig, frame)
         self.scatter.get_tk_widget().grid( row=6,column=0, sticky=tk.S)
 
-        frame_scale = tk.Frame(frame,background='', width=100, height=100, pady=10,padx = 20)
+        frame_scale = tk.Frame(frame,background='lavender', width=100, height=100, pady=10,padx = 20)
         frame_scale.grid( row=10,column=0, sticky=tk.N)
 
         scalelabel = tk.Label(frame_scale,text="Limit\nPower",bg='lavender')
@@ -87,12 +80,94 @@ class DeviceView(tk.Frame):
         self.scale = tk.Scale(frame_scale, from_=0, to=100, orient=tk.HORIZONTAL,length=200)
         self.scale.pack(side=tk.LEFT)
         self.scale.bind("<ButtonRelease-1>", self.updateScaleValue)
+    def CreateFlexibleStartUI(self,frame):
 
+        #myframe = tk.Frame(frame, bg='lavender', width=300, height=600, pady=10,padx = 10)
+        #myframe.grid( row=2,column=0, sticky=tk.N)
+
+        frame_flexible = tk.Frame(frame,background='lavender',width=100, height=100, pady=10,padx = 20)
+        frame_flexible.grid( row=2,column=0, sticky=tk.N)
+
+
+        #Flexible start button
+        label = tk.Label(frame_flexible,text="Flexible\nStart",bg='lavender')
+        label.grid( row=0,column=0, sticky=tk.N)
+
+       
+
+        self.button_flexible_stop = tk.Button(frame_flexible, text="Stop", fg="black", command=self.flexible_stop_click)
+        self.button_flexible_stop.grid( row=0,column=1, sticky=tk.W)
+
+        self.button_flexible_apply = tk.Button(frame_flexible, text="Apply", fg="black", command=self.flexible_apply_click)
+        self.button_flexible_apply.grid( row=0,column=1, sticky=tk.E)
+
+
+
+        #earliest start 
+        label = tk.Label(frame_flexible,text="Earliest Start Time: ",bg='lavender')
+        label.grid( row=1,column=0, sticky=tk.N)
+
+        self.text_flexible_earliestStartTime = tk.Text(frame_flexible,height = 1.4, width = 20)
+        self.text_flexible_earliestStartTime.grid( row=1,column=1, sticky=tk.N)
+
+        #latestEndTime
+        label = tk.Label(frame_flexible,text="Latest End Time: ",bg='lavender')
+        label.grid( row=2,column=0, sticky=tk.N)
+
+        self.text_flexible_latestEndTime = tk.Text(frame_flexible,height = 1.4, width = 20)
+        self.text_flexible_latestEndTime.grid( row=2,column=1, sticky=tk.N)
+
+        #start Time
+        label = tk.Label(frame_flexible,text="Start Time: ",bg='lavender')
+        label.grid( row=3,column=0, sticky=tk.E)
+
+        self.text_flexible_startTime = tk.Text(frame_flexible,height = 1.4, width = 20,bg='lavender')
+        self.text_flexible_startTime.grid( row=3,column=1, sticky=tk.N)
+        #self.text_flexible_startTime.configure(state='disabled')
+        #endTime
+        label = tk.Label(frame_flexible,text="End Time: ",bg='lavender')
+        label.grid( row=4,column=0, sticky=tk.E)
+
+        self.text_flexible_endTime = tk.Text(frame_flexible,height = 1.4, width = 20,bg='lavender')
+        self.text_flexible_endTime.grid( row=4,column=1, sticky=tk.N)
+        #self.text_flexible_endTime.configure(state='disabled')
+
+
+
+        # label = tk.Label(frame_flexible,text="Flexible\nPause",bg='lavender')
+        # label.pack(side=tk.LEFT)
+
+        # self.button_flexible_pause = tk.Button(frame_flexible, text="Pause", fg="black", command=self.flexible_pause_click)
+        # self.button_flexible_pause.pack(side=tk.LEFT)
+
+
+        
     def ReceiveData(self,data,requestingKnowledgeBaseId,energyUseCaseType):
+        self.data = data
         if self.deviceType == DeviceType.TEMPERATURE_SENSOR:
             self.ReceiveData_Sensor(data,requestingKnowledgeBaseId)
         elif self.deviceType == DeviceType.WASHING_MACHINE:
             self.ReceiveData_WashingMachine(data,requestingKnowledgeBaseId)
+
+        if energyUseCaseType== EnergyUseCaseType.FLEXIBLE_START:
+            if 'earliestStartTime' in data and self.text_flexible_earliestStartTime.get("1.0","end") =='\n':
+                #input = self.text_flexible_earliestStartTime.get("1.0","end")
+                self.text_flexible_earliestStartTime.delete(1.0, "end")
+                self.text_flexible_earliestStartTime.insert(1.0, data['earliestStartTime'])
+            if 'latestEndTime' in data and self.text_flexible_latestEndTime.get("1.0","end") =='\n': 
+                self.text_flexible_latestEndTime.delete(1.0, "end")
+                self.text_flexible_latestEndTime.insert(1.0, data['latestEndTime'])
+            if 'startTime' in data:
+                self.text_flexible_startTime.configure(state='normal')
+                self.text_flexible_startTime.delete(1.0, "end")
+                self.text_flexible_startTime.insert(1.0, data['startTime'])
+                self.text_flexible_startTime.configure(state='disabled')
+            if 'endTime' in data:
+                self.text_flexible_endTime.configure(state='normal')
+                self.text_flexible_endTime.delete(1.0, "end")
+                self.text_flexible_endTime.insert(1.0, data['endTime'])
+                self.text_flexible_endTime.configure(state='disabled')
+
         else: print("Error here")
 
     def ReceiveData_Sensor(self, data,requestingKnowledgeBaseId):
@@ -121,18 +196,40 @@ class DeviceView(tk.Frame):
 
     def updateScaleValue(self, event):
         print("scale value: " + str(self.scale.get()))
-    def flexible_click(self):
-        self.isFlexible = not self.isFlexible
-        self.UpdateUI_button_flexible()
+    def flexible_stop_click(self):
+        self.isFlexible_stop = not self.isFlexible_stop
+        if self.isFlexible_stop:
+            self.button_flexible_stop.config(text="ON", fg="green")
+        else:
+            self.button_flexible_stop.config(text="OFF", fg="black")
+
+    def flexible_apply_click(self):
+        data_earliestStartTime = self.text_flexible_earliestStartTime.get("1.0","end").replace('\n','')
+        data_latestEndTime = self.text_flexible_latestEndTime.get("1.0","end").replace('\n','')
+        print(data_earliestStartTime, data_latestEndTime)
+
+        self.manager.Ask(EnergyUseCaseType.FLEXIBLE_START, 
+                         {
+            "esa": self.data['esa'],
+            "earliestStartTime": data_earliestStartTime,
+            "latestEndTime": data_latestEndTime,
+        } )
+        
+
+    def flexible_pause_click(self):
+        self.isFlexible_pause = not self.isFlexible_pause
+        if self.isFlexible_pause:
+            self.button_flexible_pause.config(text="ON", fg="green")
+        else:
+            self.button_flexible_pause.config(text="OFF", fg="black")
+        
+
     def operation_click(self):
         self.isOperation = not self.isOperation
         self.UpdateUI_button_operation()
 
-    def UpdateUI_button_flexible(self):
-        if self.isFlexible:
-            self.button_flexible.config(text="Flexible: ON", fg="green")
-        else:
-            self.button_flexible.config(text="Flexible: OFF", fg="black")
+    
+        
     def UpdateUI_button_operation(self):
         if self.isOperation:
             self.button_operation.config(text="Operation: ON", fg="green")

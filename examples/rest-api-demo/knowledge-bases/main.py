@@ -19,7 +19,7 @@ class Manager:
     def __init__(self,kb_id,ke_endpoint ):
         self.kb_id = kb_id
         self.ke_endpoint = ke_endpoint
-        self.mainView = MainView("My tkinter thread", 1000)
+        self.mainView = MainView("My tkinter thread", 1000,self)
 
     def Start(self):
         self.RegisterReacts()
@@ -36,6 +36,12 @@ class Manager:
 
         for key in self.energyCases:
             self.energyCases[key].RegisterKnowledgeBaseReact()
+            self.energyCases[key].RegisterKnowledgeBaseAsk()
+
+    def Ask(self,type, structuredData):
+        if type in self.energyCases:
+            self.energyCases[type].Ask(structuredData)
+        else: print("[ERROR HERE]")
 
 
 
