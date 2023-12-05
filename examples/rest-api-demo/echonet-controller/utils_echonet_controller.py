@@ -212,7 +212,7 @@ def post(
     return response.json()["resultBindingSet"]
 
 
-def start_handle_loop(handlers: dict[str, callable], kb_id: str, ke_endpoint: str):
+def start_handle_loop(handlers: dict[str, callable], kb_id: str, ke_endpoint: str,energyUseCase):
     """
     Start the handle loop, where it will long poll to a route that returns a
     handle request when it arrives.
@@ -223,6 +223,8 @@ def start_handle_loop(handlers: dict[str, callable], kb_id: str, ke_endpoint: st
     back to the KE.
     """
     while True:
+        if energyUseCase.echonetLITEDeviceManager.isShutDown:
+            break
         now = datetime.now()
         response = requests.get(
             ke_endpoint + "sc/handle", headers={"Knowledge-Base-Id": kb_id}

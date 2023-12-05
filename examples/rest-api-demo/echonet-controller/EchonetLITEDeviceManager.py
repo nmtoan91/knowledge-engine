@@ -236,7 +236,7 @@ class EnergyUseCase:
 
     def UnRegisterKnowledgeBasePost(self):
         response = requests.delete(
-             f"{self.manager.ke_endpoint}/sc", headers={"Knowledge-Base-Id": self.kb_id}
+             f"{self.echonetLITEDeviceManager.ke_endpoint}/sc", headers={"Knowledge-Base-Id": self.kb_id}
          )
         if response.ok == False:
             print("\n\n\n Error AT:",response.text ,"\n\n\n")
@@ -262,7 +262,7 @@ class EnergyUseCase:
         )
     def UnRegisterKnowledgeBaseAnswer(self):
         response = requests.delete(
-             f"{self.manager.ke_endpoint}/sc", headers={"Knowledge-Base-Id": self.kb_id_answer}
+             f"{self.echonetLITEDeviceManager.ke_endpoint}/sc", headers={"Knowledge-Base-Id": self.kb_id_answer}
          )
         if response.ok == False:
             print("\n\n\n Error AT:",response.text ,"\n\n\n")
@@ -292,10 +292,10 @@ class EnergyUseCase:
     def HandlingAsnwerThread(self):
         start_handle_loop(
         {
-            self.ki_id_answer: self.Answer,
+            self.ki_id_answer: self.Answer
         },
         self.kb_id_answer,
-        self.echonetLITEDeviceManager.ke_endpoint,)
+        self.echonetLITEDeviceManager.ke_endpoint,self)
     def Answer(self,bindings):
         self.echonetLITEDeviceManager.Answer(bindings)
         # for binding in bindings:
@@ -386,12 +386,16 @@ class EchonetLITEDeviceManager:
     def StartLoop(self,isLoop=True):
         self.RegisterGraphs()
         self.GetInforFromEchonetLITEServer()
-        #isLoop = False
+        
+        
         if isLoop:
-            while True:
-                #print('mainloop')
-                if self.isShutDown: break
-                time.sleep(2)
+            try:
+                while True:
+                    time.sleep(1)
+            except KeyboardInterrupt:
+                print("\n\n\n\n STOP \n\n\n")
+                self.isShutDown = True
+
 
     def Answer(self,bindings):
         for binding in bindings:

@@ -112,15 +112,10 @@ if __name__ == "__main__":
     isUsingClass = True
 
     if isUsingClass:
-        # Start(
-        #     "http://150.65.230.93:8280/rest/"
-        # )
         echonetLITEDeviceManager = EchonetLITEDeviceManager("http://150.65.230.93:8280/rest/")
-        #echonetLITEDeviceManager.AddTestDevices()
         echonetLITEDeviceManager.StartLoop()
     else:
         start_sensor_kb(
-            #"http://example.org/washingmachine/mc1"+ str(random.randint(0,10000)),
             None,
             "Sensor",
             "A temperature sensor",
