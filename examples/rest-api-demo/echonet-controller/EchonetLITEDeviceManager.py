@@ -348,6 +348,7 @@ class EchonetLITEDeviceManager:
             key = deviceInfo['id']
             desc = deviceInfo['manufacturer']['descriptions']['en']
             if key not in self.devices:
+                if key != 'washerDryer-1701394427.760471': continue #test only
                 deviceType = deviceInfo['deviceType']
                 device = EchonetLITEDevice(EchonetLITEDeviceType(deviceType),
                                 "http://jaist.org/device_"+ key+ str(random.randint(0,10000)),
