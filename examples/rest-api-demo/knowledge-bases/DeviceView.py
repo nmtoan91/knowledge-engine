@@ -26,7 +26,7 @@ class DeviceView(tk.Frame):
         self.property_powerSequenceState  = "N/A"
         self.property_powerSequenceSlotPowerType  = "N/A"
         self.property_contractualPLConsumptionMaxValue = 0
-        self.property_nodeRemoteControllable = "enable"
+        self.property_nodeRemoteControllable = "uninitiated"
         self.prefix = "http://"
         self.manager = manager
         self.deviceType = deviceType
@@ -53,15 +53,22 @@ class DeviceView(tk.Frame):
         my_label.img = my_img  
         my_label.grid( row=0,column=0, sticky=tk.N)
 
-        self.CreateFlexibleStartUI(frame)
+
         frame_buttons2 = tk.Frame(frame, width=100,background='lavender', height=100, pady=10,padx = 20)
-        frame_buttons2.grid( row=4,column=0, sticky=tk.N)
+        frame_buttons2.grid( row=2,column=0, sticky=tk.N)
 
         label = tk.Label(frame_buttons2,text="Manual\nOperation",bg='lavender')
         label.pack(side=tk.LEFT)
 
-        self.button_operation = tk.Button(frame_buttons2, text="Operation", command=self.operation_click)
-        self.button_operation.pack(side=tk.RIGHT)
+        self.label_operation = tk.Label(frame_buttons2,text="OFF",bg='lavender')
+        self.label_operation.pack(side=tk.RIGHT)
+
+        #self.button_operation = tk.Button(frame_buttons2, text="Operation", command=self.operation_click)
+        #self.button_operation.pack(side=tk.RIGHT)
+
+
+        self.CreateFlexibleStartUI(frame)
+        
         
 
         self.frame = frame
@@ -96,7 +103,7 @@ class DeviceView(tk.Frame):
         #myframe.grid( row=2,column=0, sticky=tk.N)
 
         frame_flexible = tk.Frame(frame,background='lavender',width=100, height=100, pady=10,padx = 20)
-        frame_flexible.grid( row=2,column=0, sticky=tk.N)
+        frame_flexible.grid( row=4,column=0, sticky=tk.N)
 
 
         #Flexible start button
@@ -187,8 +194,13 @@ class DeviceView(tk.Frame):
                 self.property_powerSequenceSlotPowerType = data['powerSequenceSlotPowerType']
                 self.label_flexible_powerSequenceSlotPowerType.config(text=self.property_powerSequenceSlotPowerType)
             if 'nodeRemoteControllable' in data:
+                isChange = False
+                isChange = (self.property_nodeRemoteControllable!= data['nodeRemoteControllable'])
                 self.property_nodeRemoteControllable = data['nodeRemoteControllable']
-                print("\n\n\n\n\n\n\n","property_nodeRemoteControllable","\n",self.property_nodeRemoteControllable,"\n",energyUseCaseType,"\n\n\n\n\n")
+                #print("\n\n\n\n\n\n\n","property_nodeRemoteControllable","\n",self.property_nodeRemoteControllable,"\n",isChange,"\n\n\n\n\n")
+                isChange = True
+                if isChange:
+                    self.UpdateManualOperationUI()
             else: print("\n\n\n\n\n [ERROR MANUAL_OPERATION] \n\n\n")
         elif energyUseCaseType== EnergyUseCaseType.LIMITATION_POWER_CONSUMPTION:
             if 'contractualPLConsumptionMaxValue' in data and ( (datetime.now() - self.scale_lastime_modify).total_seconds() > 5):
@@ -245,7 +257,7 @@ class DeviceView(tk.Frame):
         data_endTime = self.text_flexible_endTime.get("1.0","end").replace('\n','')
         print(data_earliestStartTime, data_latestEndTime)
 
-        self.manager.Ask(EnergyUseCaseType.FLEXIBLE_START, 
+        self.manager.Ask(EnergyUseCaseType.FLEXIBLE_START_MANUAL_OPERATION, 
                          {
             "esa": self.data['esa'],
             #"powerProfile": self.data['powerProfile'],
@@ -293,6 +305,7 @@ class DeviceView(tk.Frame):
         #     self.button_operation.config(text="Operation: OFF", fg="black")
 
     def UpdateManualOperationUI(self):
+        
         if self.property_nodeRemoteControllable == 'disable':
             self.text_flexible_startTime.configure(state='disabled')
             self.text_flexible_endTime.configure(state='disabled')
@@ -300,9 +313,11 @@ class DeviceView(tk.Frame):
             self.text_flexible_earliestStartTime.configure(state='disabled')
             self.button_flexible_stop['state'] = 'disabled'
             self.button_flexible_apply['state'] = 'disabled'
-            self.button_operation.config(text="Operation: ON", fg="green")
+            self.label_operation.config(text="ENABLE")
+            #self.button_operation.config(text="Operation: ON", fg="green")
+            #self.label_flexible_powerSequenceState.config(text=self.property_powerSequenceState)
             
-        else:
+        elif self.property_nodeRemoteControllable == 'enable':
             asd=123
             self.text_flexible_startTime.configure(state='normal')
             self.text_flexible_endTime.configure(state='normal')
@@ -310,7 +325,8 @@ class DeviceView(tk.Frame):
             self.text_flexible_earliestStartTime.configure(state='normal')
             self.button_flexible_stop['state'] = 'normal'
             self.button_flexible_apply['state'] = 'normal'
-            self.button_operation.config(text="Operation: OFF", fg="black")
+            self.label_operation.config(text="DISABLE")
+            #self.button_operation.config(text="Operation: OFF", fg="black")
             
 
 
