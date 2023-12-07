@@ -38,7 +38,7 @@ class Manager:
         self.energyCases[EnergyUseCaseType.LIMITATION_POWER_CONSUMPTION] =  EnergyUseCase(EnergyUseCaseType.LIMITATION_POWER_CONSUMPTION,self)
         # self.energyCases[EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_INCENTIVE_TABLE] =  EnergyUseCase(EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_INCENTIVE_TABLE,self)
         # self.energyCases[EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN] =  EnergyUseCase(EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN,self)
-        # self.energyCases[EnergyUseCaseType.MANUAL_OPERATION] =  EnergyUseCase(EnergyUseCaseType.MANUAL_OPERATION,self)
+        self.energyCases[EnergyUseCaseType.MANUAL_OPERATION] =  EnergyUseCase(EnergyUseCaseType.MANUAL_OPERATION,self)
 
         for key in self.energyCases:
             self.energyCases[key].RegisterKnowledgeBaseReact()

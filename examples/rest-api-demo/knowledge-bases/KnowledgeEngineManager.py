@@ -24,21 +24,11 @@ class EnergyUseCase:
         self.manager = manager
         self.type = type
         self.kb_id = "http://jaist.org/devicees_" + str(type)+ str(random.randint(0,10000))
-        self.kb_id_ask = self.kb_id + "ask"
+        self.kb_id_ask = self.kb_id + "_ask"
         self.kb_name = "UIManager_" + str(type)
         self.kb_description = "An EchonetLITE Device Manager: " + str(type)
 
-        # if self.type == EnergyUseCaseType.FLEXIBLE_START:
-        #     self.kb_id = "http://jaist.org/devicees_" + type
-        # if self.type == EnergyUseCaseType.MONITORING_POWER_CONSUMPTION:
-            
-        # if self.type == EnergyUseCaseType.LIMITATION_POWER_CONSUMPTION:
-            
-        # if self.type == EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_INCENTIVE_TABLE:
-            
-        # if self.type == EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN:
-            
-        # if self.type == EnergyUseCaseType.MANUAL_OPERATION:
+
 
     def GetGraphByType(self):
         if self.type == EnergyUseCaseType.FLEXIBLE_START:

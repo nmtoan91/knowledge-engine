@@ -103,13 +103,17 @@ class EchonetLITEDevice:
         sotangdan =1
         response = requests.get(self.el_endpoint+'/elapi/v1/devices/' + self.el_id+'/properties')
         self.el_data =data = json.loads(response.text)
+        onTimerReservationStatus = 'enable'
+        if 'onTimerReservationStatus' in self.el_data:
+            onTimerReservationStatus = self.el_data['onTimerReservationStatus']
+            
         prefix = "http://jaist.ac.com/"
         esa = self.kb_id#prefix+"esa"+self.el_id
         commodity = prefix+"commodity" + self.el_id
         commodityProperty = prefix+"commodityProperty"+ self.el_id
         power= prefix + "power" +  self.el_id
         powerProfile= prefix +"powerProfile" +  self.el_id
-        nodeRemoteControllable =  "True"
+        #nodeRemoteControllable =  "True"
         supportsReselection = "True"
         alternativesgroup = prefix + "alternativesgroup" + self.el_id
         alternativesID = "echonet" +  self.el_id
@@ -143,7 +147,7 @@ class EchonetLITEDevice:
             "commodityProperty": f"{commodityProperty}",
             "power": f"{power}",
             "powerProfile": f"{powerProfile}",
-            "nodeRemoteControllable": f"{nodeRemoteControllable}",
+            "nodeRemoteControllable": f"{onTimerReservationStatus}",
             "supportsReselection": f"{supportsReselection}",
             "alternativesgroup": f"{alternativesgroup}",
             "alternativesID": f"{alternativesID}",
@@ -278,7 +282,7 @@ class EchonetLITEDevice:
 
 
         data_MANAGEMENT_POWER_CONSUMPTION_INCENTIVE_TABLE = {
-            "esa": f"<https://example.org/power/{esa}>",
+            "esa": f"{esa}",
             "incentiveBasedProfile":f"{incentiveBasedProfile}",
             "incentiveBasedProfileId":f"{incentiveBasedProfileId}",
             "incentiveBasedProfileIsChangeable":f"{incentiveBasedProfileIsChangeable}",
@@ -319,7 +323,7 @@ class EchonetLITEDevice:
         powerPlanDataPointUnit="powerPlanDataPointUnit"
         powerPlanDataPointValue="powerPlanDataPointValue"
         data_MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN = {
-            "esa": f"<https://example.org/power/{esa}>",
+            "esa": f"{esa}",
             "incentiveBasedProfile":f"{incentiveBasedProfile}",
             "IncentiveBasedProfile":f"{IncentiveBasedProfile}",
             "powerPlan":f"{powerPlan}",
@@ -339,38 +343,39 @@ class EchonetLITEDevice:
         }
         self.structureData[EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN] = data_MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN
 
+        
 
-        data_MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN = {
-            "esa": f"<https://example.org/power/{esa}>",
-            "commodity": f"{commodity}",
-            "commodityProperty": f"{commodityProperty}",
-            "power": f"{power}",
-            "powerProfile": f"{powerProfile}",
-            "nodeRemoteControllable": f"{nodeRemoteControllable}",
-            "supportsReselection": f"{supportsReselection}",
-            "alternativesgroup": f"{alternativesgroup}",
-            "alternativesID": f"{alternativesID}",
-            "powerSequence": f"{powerSequence}",
-            "sequenceID": f"{sequenceID}",
-            "powerSequenceState": f"{powerSequenceState}",
-            "activeSlotNumber": f"{activeSlotNumber}",
-            "sequenceRemoteControllable": f"{sequenceRemoteControllable}",
-            "startTime": f"{startTime}",
-            "endTime": f"{endTime}",
-            "earliestStartTime": f"{earliestStartTime}",
-            "latestEndTime": f"{latestEndTime}",
-            "isPausable": f"{isPausable}",
-            "isStoppable": f"{isStoppable}",
-            "valueSource": f"{valueSource}",
-            "powerSequenceSlot": f"{powerSequenceSlot}",
-            "powerSequenceSlotNumber": f"{powerSequenceSlotNumber}",
-            "powerSequenceSlotDefaultDuration": f"{powerSequenceSlotDefaultDuration}",
-            "powerSequenceSlotPower": f"{powerSequenceSlotPower}",
-            "powerSequenceSlotProperty": f"{powerSequenceSlotProperty}",
-            "powerSequenceSlotPowerType": f"{powerSequenceSlotPowerType}",
-            "powerSequenceSlotValue": f"{powerSequenceSlotValue}",
+        data_MANUAL_OPERATION = {
+            "esa": f"{esa}",
+            #"commodity": f"{commodity}",
+            #"commodityProperty": f"{commodityProperty}",
+            #"power": f"{onTimerReservationStatus}",
+            #"powerProfile": f"{powerProfile}",
+            "nodeRemoteControllable": f"{onTimerReservationStatus}",
+            # "supportsReselection": f"{supportsReselection}",
+            # "alternativesgroup": f"{alternativesgroup}",
+            # "alternativesID": f"{alternativesID}",
+            # "powerSequence": f"{powerSequence}",
+            # "sequenceID": f"{sequenceID}",
+            # "powerSequenceState": f"{powerSequenceState}",
+            # "activeSlotNumber": f"{activeSlotNumber}",
+            # "sequenceRemoteControllable": f"{sequenceRemoteControllable}",
+            # "startTime": f"{startTime}",
+            # "endTime": f"{endTime}",
+            # "earliestStartTime": f"{earliestStartTime}",
+            # "latestEndTime": f"{latestEndTime}",
+            # "isPausable": f"{isPausable}",
+            # "isStoppable": f"{isStoppable}",
+            # "valueSource": f"{valueSource}",
+            # "powerSequenceSlot": f"{powerSequenceSlot}",
+            # "powerSequenceSlotNumber": f"{powerSequenceSlotNumber}",
+            # "powerSequenceSlotDefaultDuration": f"{powerSequenceSlotDefaultDuration}",
+            # "powerSequenceSlotPower": f"{powerSequenceSlotPower}",
+            # "powerSequenceSlotProperty": f"{powerSequenceSlotProperty}",
+            # "powerSequenceSlotPowerType": f"{powerSequenceSlotPowerType}",
+            # "powerSequenceSlotValue": f"{powerSequenceSlotValue}",
         }
-        self.structureData[EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN] = data_MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN
+        self.structureData[EnergyUseCaseType.MANUAL_OPERATION] = data_MANUAL_OPERATION
 
         while self.echonetLITEDeviceManager.initialized == False:
             time.sleep(1)

@@ -26,6 +26,7 @@ class DeviceView(tk.Frame):
         self.property_powerSequenceState  = "N/A"
         self.property_powerSequenceSlotPowerType  = "N/A"
         self.property_contractualPLConsumptionMaxValue = 0
+        self.property_nodeRemoteControllable = "enable"
         self.prefix = "http://"
         self.manager = manager
         self.deviceType = deviceType
@@ -38,7 +39,7 @@ class DeviceView(tk.Frame):
         self.id = id
         self.isFlexible_stop = False
         self.isFlexible_pause = False
-        self.isOperation = False
+        #self.isOperation = False
         self.data_x = []
         self.data_y = []
 
@@ -61,7 +62,7 @@ class DeviceView(tk.Frame):
 
         self.button_operation = tk.Button(frame_buttons2, text="Operation", command=self.operation_click)
         self.button_operation.pack(side=tk.RIGHT)
-        self.UpdateUI_button_operation()
+        
 
         self.frame = frame
 
@@ -86,6 +87,9 @@ class DeviceView(tk.Frame):
         self.scale.pack(side=tk.LEFT)
         self.scale_lastime_modify = datetime(1111,1,1,1,11,11)
         self.scale.bind("<ButtonRelease-1>", self.updateScaleValue)
+
+
+        self.UpdateManualOperationUI()
     def CreateFlexibleStartUI(self,frame):
 
         #myframe = tk.Frame(frame, bg='lavender', width=300, height=600, pady=10,padx = 10)
@@ -188,7 +192,11 @@ class DeviceView(tk.Frame):
                 self.scale.set(self.property_contractualPLConsumptionMaxValue)
                 #print("\n\n\n\n",self.property_contractualPLConsumptionMaxValue,"\n\n\n")
             
-
+        elif energyUseCaseType == EnergyUseCaseType.MANUAL_OPERATION:
+            if 'nodeRemoteControllable' in data:
+                self.property_nodeRemoteControllable = data['nodeRemoteControllable']
+                print("\n\n\n\n\n\n\n","property_nodeRemoteControllable","\n",self.property_nodeRemoteControllable,"\n",energyUseCaseType,"\n\n\n\n\n")
+            else: print("\n\n\n\n\n [ERROR MANUAL_OPERATION] \n\n\n")
 
         else: print("Error here")
 
@@ -271,13 +279,41 @@ class DeviceView(tk.Frame):
         
 
     def operation_click(self):
-        self.isOperation = not self.isOperation
-        self.UpdateUI_button_operation()
+        #self.isOperation = not self.isOperation
+        if self.property_nodeRemoteControllable == 'disable':
+            self.property_nodeRemoteControllable = "enable"
+        elif self.property_nodeRemoteControllable == 'enable':
+            self.property_nodeRemoteControllable = "disable"
+        else: print("ERROR CANNOT UNDERSTANT: " + self.property_nodeRemoteControllable)
+        self.UpdateManualOperationUI()
+        # if self.isOperation:
+        #     self.button_operation.config(text="Operation: ON", fg="green")
+        # else:
+        #     self.button_operation.config(text="Operation: OFF", fg="black")
+
+    def UpdateManualOperationUI(self):
+        if self.property_nodeRemoteControllable == 'disable':
+            self.text_flexible_startTime.configure(state='disabled')
+            self.text_flexible_endTime.configure(state='disabled')
+            self.text_flexible_latestEndTime.configure(state='disabled')
+            self.text_flexible_earliestStartTime.configure(state='disabled')
+            self.button_flexible_stop['state'] = 'disabled'
+            self.button_flexible_apply['state'] = 'disabled'
+            self.button_operation.config(text="Operation: ON", fg="green")
+            
+        else:
+            asd=123
+            self.text_flexible_startTime.configure(state='normal')
+            self.text_flexible_endTime.configure(state='normal')
+            self.text_flexible_latestEndTime.configure(state='normal')
+            self.text_flexible_earliestStartTime.configure(state='normal')
+            self.button_flexible_stop['state'] = 'normal'
+            self.button_flexible_apply['state'] = 'normal'
+            self.button_operation.config(text="Operation: OFF", fg="black")
+            
+
 
     
         
-    def UpdateUI_button_operation(self):
-        if self.isOperation:
-            self.button_operation.config(text="Operation: ON", fg="green")
-        else:
-            self.button_operation.config(text="Operation: OFF", fg="black")
+    
+        

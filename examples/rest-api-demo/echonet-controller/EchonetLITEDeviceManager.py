@@ -23,19 +23,7 @@ class EnergyUseCase:
         self.kb_id_answer = self.kb_id + "_answer"
         self.kb_name = "EchonetLITEDeviceManager_" + str(type)
         self.kb_description = "An EchonetLITE Device Manager: " + str(type)
-
-        # if self.type == EnergyUseCaseType.FLEXIBLE_START:
-        #     self.kb_id = "http://jaist.org/devicees_" + type
-        # if self.type == EnergyUseCaseType.MONITORING_POWER_CONSUMPTION:
-            
-        # if self.type == EnergyUseCaseType.LIMITATION_POWER_CONSUMPTION:
-            
-        # if self.type == EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_INCENTIVE_TABLE:
-            
-        # if self.type == EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN:
-            
-        # if self.type == EnergyUseCaseType.MANUAL_OPERATION:
-
+        
     def GetGraphByType(self):
         if self.type == EnergyUseCaseType.FLEXIBLE_START:
             return """
@@ -369,7 +357,7 @@ class EchonetLITEDeviceManager:
         self.energyCases[EnergyUseCaseType.LIMITATION_POWER_CONSUMPTION]=EnergyUseCase(EnergyUseCaseType.LIMITATION_POWER_CONSUMPTION,self)
         # self.energyCases[EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_INCENTIVE_TABLE]=EnergyUseCase(EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_INCENTIVE_TABLE,self)
         # self.energyCases[EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN]=EnergyUseCase(EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN,self)
-        # self.energyCases[EnergyUseCaseType.MANUAL_OPERATION]=EnergyUseCase(EnergyUseCaseType.MANUAL_OPERATION,self)
+        self.energyCases[EnergyUseCaseType.MANUAL_OPERATION]=EnergyUseCase(EnergyUseCaseType.MANUAL_OPERATION,self)
 
 
         for key in self.energyCases:
