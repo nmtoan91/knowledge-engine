@@ -161,7 +161,7 @@ class DeviceView(tk.Frame):
         elif self.deviceType == DeviceType.WASHING_MACHINE:
             self.ReceiveData_WashingMachine(data,requestingKnowledgeBaseId)
 
-        if energyUseCaseType== EnergyUseCaseType.FLEXIBLE_START:
+        if energyUseCaseType== EnergyUseCaseType.FLEXIBLE_START_MANUAL_OPERATION:
             if 'earliestStartTime' in data and self.text_flexible_earliestStartTime.get("1.0","end") =='\n':
                 #input = self.text_flexible_earliestStartTime.get("1.0","end")
                 self.text_flexible_earliestStartTime.delete(1.0, "end")
@@ -186,17 +186,18 @@ class DeviceView(tk.Frame):
             if 'powerSequenceSlotPowerType' in data:
                 self.property_powerSequenceSlotPowerType = data['powerSequenceSlotPowerType']
                 self.label_flexible_powerSequenceSlotPowerType.config(text=self.property_powerSequenceSlotPowerType)
+            if 'nodeRemoteControllable' in data:
+                self.property_nodeRemoteControllable = data['nodeRemoteControllable']
+                print("\n\n\n\n\n\n\n","property_nodeRemoteControllable","\n",self.property_nodeRemoteControllable,"\n",energyUseCaseType,"\n\n\n\n\n")
+            else: print("\n\n\n\n\n [ERROR MANUAL_OPERATION] \n\n\n")
         elif energyUseCaseType== EnergyUseCaseType.LIMITATION_POWER_CONSUMPTION:
             if 'contractualPLConsumptionMaxValue' in data and ( (datetime.now() - self.scale_lastime_modify).total_seconds() > 5):
                 self.property_contractualPLConsumptionMaxValue = int(data['contractualPLConsumptionMaxValue'])*100/65535
                 self.scale.set(self.property_contractualPLConsumptionMaxValue)
                 #print("\n\n\n\n",self.property_contractualPLConsumptionMaxValue,"\n\n\n")
             
-        elif energyUseCaseType == EnergyUseCaseType.MANUAL_OPERATION:
-            if 'nodeRemoteControllable' in data:
-                self.property_nodeRemoteControllable = data['nodeRemoteControllable']
-                print("\n\n\n\n\n\n\n","property_nodeRemoteControllable","\n",self.property_nodeRemoteControllable,"\n",energyUseCaseType,"\n\n\n\n\n")
-            else: print("\n\n\n\n\n [ERROR MANUAL_OPERATION] \n\n\n")
+        
+            
 
         else: print("Error here")
 

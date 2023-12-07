@@ -11,12 +11,12 @@ import json
 
 class EnergyUseCaseType(Enum):
     UNKNOWN=0,
-    FLEXIBLE_START="FLEXIBLE_START"
+    FLEXIBLE_START_MANUAL_OPERATION="FLEXIBLE_START_MANUAL_OPERATION"
     MONITORING_POWER_CONSUMPTION = "MONITORING_POWER_CONSUMPTION"
     LIMITATION_POWER_CONSUMPTION="LIMITATION_POWER_CONSUMPTION"
     MANAGEMENT_POWER_CONSUMPTION_INCENTIVE_TABLE="MANAGEMENT_POWER_CONSUMPTION_INCENTIVE_TABLE"
     MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN="MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN"
-    MANUAL_OPERATION="MANUAL_OPERATION"
+    #MANUAL_OPERATION="MANUAL_OPERATION"
 
     
 class EnergyUseCase:
@@ -31,7 +31,7 @@ class EnergyUseCase:
 
 
     def GetGraphByType(self):
-        if self.type == EnergyUseCaseType.FLEXIBLE_START:
+        if self.type == EnergyUseCaseType.FLEXIBLE_START_MANUAL_OPERATION:
             return """
                         ?esa rdf:type saref:Device .
                         ?esa saref:isUsedFor ?commodity .
@@ -167,45 +167,45 @@ class EnergyUseCase:
                 ?powerPlanDataPoint saref:isMeasuredIn ?powerPlanDataPointUnit .
                 ?powerPlanDataPoint saref:hasValue ?powerPlanDataPointValue .
                 """
-        if self.type == EnergyUseCaseType.MANUAL_OPERATION:
-            return """
-                ?esa rdf:type saref:Device .
-                ?esa saref:isUsedFor ?commodity .
-                ?commodity rdf:type saref:Electricity .
-                ?esa saref:makesMeasurement ?commodityProperty .
-                ?commodityProperty saref:relatesToProperty ?power .
-                ?power rdf:type saref:Power .
-                ?esa saref:hasProfile ?powerProfile .
-                ?powerprofile rdf:type s4ener:PowerProfile  .
-                ?powerprofile s4ener:isRemoteControllable ?nodeRemoteControllable .
-                ?powerprofile s4ener:supportsReselection ?supportsReselection .
-                ?powerProfile saref:consistsOf ?alternativesgroup .
-                ?alternativesgroup rdf:type s4ener:AlternativesGroup .
-                ?alternativesgroup saref:hasIdentifier ?alternativesID .
-                ?alternativesgroup saref:consistsOf ?powerSequence .
-                ?powerSequence rdf:type s4ener:PowerSequence .
-                ?powerSequence saref:hasIdentifier ?sequenceID .
-                ?powerSequence saref:hasState ?powerSequenceState .
-                ?powerSequence s4ener:activeSlotNumber ?activeSlotNumber .
-                ?powerSequence s4ener:isRemoteControllable ?sequenceRemoteControllable .
-                ?powerSequence s4ener:hasStartTime ?startTime .
-                ?powerSequence s4ener:hasEndTime ?endTime .
-                ?powerSequence s4ener:hasEarliestStartTime ?earliestStartTime . 
-                ?powerSequence s4ener:hasLatestEndTime ?latestEndTime .
-                ?powerSequence s4ener:isPausable ?isPausable .
-                ?powerSequence s4ener:isStoppable ?isStoppable .
-                ?powerSequence s4ener:hasValueSource ?valueSource . 
-                ?powerSequence saref:consistsOf ?powerSequenceSlot .
-                ?powerSequenceSlot rdf:type s4ener:Slot .
-                ?powerSequenceSlot saref:hasIdentifier ?powerSequenceSlotNumber .
-                ?powerSequenceSlot s4ener:hasDefaultDuration ?powerSequenceSlotDefaultDuration .
-                ?powerSequenceSlot s4ener:hasSlotValue ?powerSequenceSlotPower .
-                ?powerSequenceSlotPower rdf:type saref:Measurement .
-                ?powerSequenceSlotPower saref:relatesToProperty?powerSequenceSlotProperty .
-                ?powerSequenceSlotPower s4ener:hasUsage ?powerSequenceSlotPowerType .
-                ?powerSequenceSlotPower saref:isMeasuredIn om:watt .
-                ?powerSequenceSlotPower saref:hasValue ?powerSequenceSlotValue .
-                """
+        # if self.type == EnergyUseCaseType.MANUAL_OPERATION:
+        #     return """
+        #         ?esa rdf:type saref:Device .
+        #         ?esa saref:isUsedFor ?commodity .
+        #         ?commodity rdf:type saref:Electricity .
+        #         ?esa saref:makesMeasurement ?commodityProperty .
+        #         ?commodityProperty saref:relatesToProperty ?power .
+        #         ?power rdf:type saref:Power .
+        #         ?esa saref:hasProfile ?powerProfile .
+        #         ?powerprofile rdf:type s4ener:PowerProfile  .
+        #         ?powerprofile s4ener:isRemoteControllable ?nodeRemoteControllable .
+        #         ?powerprofile s4ener:supportsReselection ?supportsReselection .
+        #         ?powerProfile saref:consistsOf ?alternativesgroup .
+        #         ?alternativesgroup rdf:type s4ener:AlternativesGroup .
+        #         ?alternativesgroup saref:hasIdentifier ?alternativesID .
+        #         ?alternativesgroup saref:consistsOf ?powerSequence .
+        #         ?powerSequence rdf:type s4ener:PowerSequence .
+        #         ?powerSequence saref:hasIdentifier ?sequenceID .
+        #         ?powerSequence saref:hasState ?powerSequenceState .
+        #         ?powerSequence s4ener:activeSlotNumber ?activeSlotNumber .
+        #         ?powerSequence s4ener:isRemoteControllable ?sequenceRemoteControllable .
+        #         ?powerSequence s4ener:hasStartTime ?startTime .
+        #         ?powerSequence s4ener:hasEndTime ?endTime .
+        #         ?powerSequence s4ener:hasEarliestStartTime ?earliestStartTime . 
+        #         ?powerSequence s4ener:hasLatestEndTime ?latestEndTime .
+        #         ?powerSequence s4ener:isPausable ?isPausable .
+        #         ?powerSequence s4ener:isStoppable ?isStoppable .
+        #         ?powerSequence s4ener:hasValueSource ?valueSource . 
+        #         ?powerSequence saref:consistsOf ?powerSequenceSlot .
+        #         ?powerSequenceSlot rdf:type s4ener:Slot .
+        #         ?powerSequenceSlot saref:hasIdentifier ?powerSequenceSlotNumber .
+        #         ?powerSequenceSlot s4ener:hasDefaultDuration ?powerSequenceSlotDefaultDuration .
+        #         ?powerSequenceSlot s4ener:hasSlotValue ?powerSequenceSlotPower .
+        #         ?powerSequenceSlotPower rdf:type saref:Measurement .
+        #         ?powerSequenceSlotPower saref:relatesToProperty?powerSequenceSlotProperty .
+        #         ?powerSequenceSlotPower s4ener:hasUsage ?powerSequenceSlotPowerType .
+        #         ?powerSequenceSlotPower saref:isMeasuredIn om:watt .
+        #         ?powerSequenceSlotPower saref:hasValue ?powerSequenceSlotValue .
+        #         """
         print("\n\n\n Error \n\n\n")
         return None
     def SendData(self,data):

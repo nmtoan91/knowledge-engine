@@ -12,12 +12,12 @@ import json
 
 class EnergyUseCaseType(Enum):
     UNKNOWN=0,
-    FLEXIBLE_START="FLEXIBLE_START"
+    FLEXIBLE_START_MANUAL_OPERATION="FLEXIBLE_START_MANUAL_OPERATION"
     MONITORING_POWER_CONSUMPTION = "MONITORING_POWER_CONSUMPTION"
     LIMITATION_POWER_CONSUMPTION="LIMITATION_POWER_CONSUMPTION"
     MANAGEMENT_POWER_CONSUMPTION_INCENTIVE_TABLE="MANAGEMENT_POWER_CONSUMPTION_INCENTIVE_TABLE"
     MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN="MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN"
-    MANUAL_OPERATION="MANUAL_OPERATION"
+    #MANUAL_OPERATION="MANUAL_OPERATION"
 
 def generate_random_temperature(start=15.0, end=20.0):
     assert end > start
@@ -171,7 +171,7 @@ class EchonetLITEDevice:
             "powerSequenceSlotPowerType": f"{powerSequenceSlotPowerType}",
             "powerSequenceSlotValue": f"{powerSequenceSlotValue}"
         }
-        self.structureData[EnergyUseCaseType.FLEXIBLE_START] = data_FLEXIBLE_START
+        self.structureData[EnergyUseCaseType.FLEXIBLE_START_MANUAL_OPERATION] = data_FLEXIBLE_START
 
 
         monitoring_of_power_consumption = "monitoring_of_power_consumption"
@@ -345,37 +345,37 @@ class EchonetLITEDevice:
 
         
 
-        data_MANUAL_OPERATION = {
-            "esa": f"{esa}",
-            #"commodity": f"{commodity}",
-            #"commodityProperty": f"{commodityProperty}",
-            #"power": f"{onTimerReservationStatus}",
-            #"powerProfile": f"{powerProfile}",
-            "nodeRemoteControllable": f"{onTimerReservationStatus}",
-            # "supportsReselection": f"{supportsReselection}",
-            # "alternativesgroup": f"{alternativesgroup}",
-            # "alternativesID": f"{alternativesID}",
-            # "powerSequence": f"{powerSequence}",
-            # "sequenceID": f"{sequenceID}",
-            # "powerSequenceState": f"{powerSequenceState}",
-            # "activeSlotNumber": f"{activeSlotNumber}",
-            # "sequenceRemoteControllable": f"{sequenceRemoteControllable}",
-            # "startTime": f"{startTime}",
-            # "endTime": f"{endTime}",
-            # "earliestStartTime": f"{earliestStartTime}",
-            # "latestEndTime": f"{latestEndTime}",
-            # "isPausable": f"{isPausable}",
-            # "isStoppable": f"{isStoppable}",
-            # "valueSource": f"{valueSource}",
-            # "powerSequenceSlot": f"{powerSequenceSlot}",
-            # "powerSequenceSlotNumber": f"{powerSequenceSlotNumber}",
-            # "powerSequenceSlotDefaultDuration": f"{powerSequenceSlotDefaultDuration}",
-            # "powerSequenceSlotPower": f"{powerSequenceSlotPower}",
-            # "powerSequenceSlotProperty": f"{powerSequenceSlotProperty}",
-            # "powerSequenceSlotPowerType": f"{powerSequenceSlotPowerType}",
-            # "powerSequenceSlotValue": f"{powerSequenceSlotValue}",
-        }
-        self.structureData[EnergyUseCaseType.MANUAL_OPERATION] = data_MANUAL_OPERATION
+        # data_MANUAL_OPERATION = {
+        #     "esa": f"{esa}",
+        #     #"commodity": f"{commodity}",
+        #     #"commodityProperty": f"{commodityProperty}",
+        #     #"power": f"{onTimerReservationStatus}",
+        #     #"powerProfile": f"{powerProfile}",
+        #     "nodeRemoteControllable": f"{onTimerReservationStatus}",
+        #     # "supportsReselection": f"{supportsReselection}",
+        #     # "alternativesgroup": f"{alternativesgroup}",
+        #     # "alternativesID": f"{alternativesID}",
+        #     # "powerSequence": f"{powerSequence}",
+        #     # "sequenceID": f"{sequenceID}",
+        #     # "powerSequenceState": f"{powerSequenceState}",
+        #     # "activeSlotNumber": f"{activeSlotNumber}",
+        #     # "sequenceRemoteControllable": f"{sequenceRemoteControllable}",
+        #     # "startTime": f"{startTime}",
+        #     # "endTime": f"{endTime}",
+        #     # "earliestStartTime": f"{earliestStartTime}",
+        #     # "latestEndTime": f"{latestEndTime}",
+        #     # "isPausable": f"{isPausable}",
+        #     # "isStoppable": f"{isStoppable}",
+        #     # "valueSource": f"{valueSource}",
+        #     # "powerSequenceSlot": f"{powerSequenceSlot}",
+        #     # "powerSequenceSlotNumber": f"{powerSequenceSlotNumber}",
+        #     # "powerSequenceSlotDefaultDuration": f"{powerSequenceSlotDefaultDuration}",
+        #     # "powerSequenceSlotPower": f"{powerSequenceSlotPower}",
+        #     # "powerSequenceSlotProperty": f"{powerSequenceSlotProperty}",
+        #     # "powerSequenceSlotPowerType": f"{powerSequenceSlotPowerType}",
+        #     # "powerSequenceSlotValue": f"{powerSequenceSlotValue}",
+        # }
+        # self.structureData[EnergyUseCaseType.MANUAL_OPERATION] = data_MANUAL_OPERATION
 
         while self.echonetLITEDeviceManager.initialized == False:
             time.sleep(1)
