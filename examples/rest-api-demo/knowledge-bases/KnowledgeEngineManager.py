@@ -279,10 +279,10 @@ class EnergyUseCase:
         )
 
     def present_measurement(self,binding: dict[str, str],requestingKnowledgeBaseId, historical: bool = False):
-        s = "data="
-        for key, value in binding.items() :
-            s += f"{key}:{value}  "
-        print(s)
+        # s = "data="
+        # for key, value in binding.items() :
+        #     s += f"{key}:{value}  "
+        # print(s)
 
         self.manager.mainView.ReceiveData(binding,requestingKnowledgeBaseId,self.type)
 

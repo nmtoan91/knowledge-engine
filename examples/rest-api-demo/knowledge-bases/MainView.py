@@ -4,6 +4,7 @@ import threading
 from PIL import Image, ImageTk
 from DeviceView import DeviceView
 from DeviceView import DeviceType
+from KnowledgeEngineManager import EnergyUseCaseType
 
 class MainView(threading.Thread):
     def __init__(self, thread_name, thread_ID,manager): 
@@ -17,7 +18,7 @@ class MainView(threading.Thread):
         self.root = tk.Tk()
         self.root.geometry("600x800")
         self.root.title('Demonstation')
-        self.root.geometry('{}x{}'.format(900, 650))
+        self.root.geometry('{}x{}'.format(1000, 750))
 
         self.root.columnconfigure(0, weight=1)
         self.root.columnconfigure(1, weight=1)
@@ -35,7 +36,8 @@ class MainView(threading.Thread):
 
         if deviceId in self.devices:
              self.devices[deviceId].ReceiveData(data,deviceId,energyUseCaseType)
-        else: 
+        elif energyUseCaseType == EnergyUseCaseType.FLEXIBLE_START_MANUAL_OPERATION: 
+
             type = DeviceType.GetDeviceType(data)
             if type == DeviceType.UNKNOWN: 
                 print("Cannot find view",type)

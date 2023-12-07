@@ -53,6 +53,9 @@ class DeviceView(tk.Frame):
         my_label.img = my_img  
         my_label.grid( row=0,column=0, sticky=tk.N)
 
+        self.label_device_id =tk.Label(frame,text=id,bg='lavender')
+        self.label_device_id.grid( row=1,column=0, sticky=tk.N)
+
 
         frame_buttons2 = tk.Frame(frame, width=100,background='lavender', height=100, pady=10,padx = 20)
         frame_buttons2.grid( row=2,column=0, sticky=tk.N)
@@ -186,13 +189,13 @@ class DeviceView(tk.Frame):
                 self.text_flexible_endTime.insert(1.0, data['endTime'])
             if 'powerSequenceState' in data:
                 self.property_powerSequenceState = data['powerSequenceState']
-                self.label_flexible_powerSequenceState.config(text=self.property_powerSequenceState)
+                self.label_flexible_powerSequenceState.config(text='powerSequenceState:\n' + self.property_powerSequenceState.replace('s4ener:',''))
             if 'valueSource' in data:
                 self.property_valueSource = data['valueSource']
-                self.label_flexible_valueSource.config(text=self.property_valueSource)
+                self.label_flexible_valueSource.config(text='valueSource:\n'+self.property_valueSource.replace('s4ener:',''))
             if 'powerSequenceSlotPowerType' in data:
                 self.property_powerSequenceSlotPowerType = data['powerSequenceSlotPowerType']
-                self.label_flexible_powerSequenceSlotPowerType.config(text=self.property_powerSequenceSlotPowerType)
+                self.label_flexible_powerSequenceSlotPowerType.config(text='powerSequenceSlotPowerType:\n'+self.property_powerSequenceSlotPowerType.replace('s4ener:',''))
             if 'nodeRemoteControllable' in data:
                 isChange = False
                 isChange = (self.property_nodeRemoteControllable!= data['nodeRemoteControllable'])
