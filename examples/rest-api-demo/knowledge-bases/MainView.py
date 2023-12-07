@@ -31,14 +31,16 @@ class MainView(threading.Thread):
         self.run()
     def ReceiveData(self, data,requestingKnowledgeBaseId,energyUseCaseType):
         if not hasattr(self,'devices'):  return
-        if requestingKnowledgeBaseId in self.devices:
-             self.devices[requestingKnowledgeBaseId].ReceiveData(data,requestingKnowledgeBaseId,energyUseCaseType)
+        deviceId = data['esa']
+
+        if deviceId in self.devices:
+             self.devices[deviceId].ReceiveData(data,deviceId,energyUseCaseType)
         else: 
             type = DeviceType.GetDeviceType(data)
             if type == DeviceType.UNKNOWN: 
                 print("Cannot find view",type)
                 return
-            self.AddDevice(requestingKnowledgeBaseId,type)    
+            self.AddDevice(deviceId,type)    
 
     def AddDevice(self, deviceId, deviceType:DeviceType):
         frame  = DeviceView(self.root,deviceId,deviceType,self.manager)

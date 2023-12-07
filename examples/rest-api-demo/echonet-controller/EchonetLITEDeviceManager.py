@@ -366,7 +366,7 @@ class EchonetLITEDeviceManager:
         self.energyCases = {}
         self.energyCases[EnergyUseCaseType.FLEXIBLE_START]=EnergyUseCase(EnergyUseCaseType.FLEXIBLE_START,self)
         # self.energyCases[EnergyUseCaseType.MONITORING_POWER_CONSUMPTION]=EnergyUseCase(EnergyUseCaseType.MONITORING_POWER_CONSUMPTION,self)
-        # self.energyCases[EnergyUseCaseType.LIMITATION_POWER_CONSUMPTION]=EnergyUseCase(EnergyUseCaseType.LIMITATION_POWER_CONSUMPTION,self)
+        self.energyCases[EnergyUseCaseType.LIMITATION_POWER_CONSUMPTION]=EnergyUseCase(EnergyUseCaseType.LIMITATION_POWER_CONSUMPTION,self)
         # self.energyCases[EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_INCENTIVE_TABLE]=EnergyUseCase(EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_INCENTIVE_TABLE,self)
         # self.energyCases[EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN]=EnergyUseCase(EnergyUseCaseType.MANAGEMENT_POWER_CONSUMPTION_POWER_PLAN,self)
         # self.energyCases[EnergyUseCaseType.MANUAL_OPERATION]=EnergyUseCase(EnergyUseCaseType.MANUAL_OPERATION,self)

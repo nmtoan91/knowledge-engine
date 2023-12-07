@@ -73,13 +73,29 @@ class EchonetLITEDevice:
         if 'latestEndTime' in bindings:
             self.property_latestEndTime = bindings['latestEndTime']
         if 'startTime' in bindings:
+            if 'onTimerAbsolute' in self.el_data:
+                self.el_data['onTimerAbsolute'] = bindings['startTime']
+                self.SetDataToDevice('onTimerAbsolute',bindings['startTime'])
+            else: print("\n\n\n not here \n\n\n")
             self.property_startTime = bindings['startTime']
+        #else: print("\n\n\n not here 2 \n\n\n")
         if 'endTime' in bindings:
             self.property_endTime = bindings['endTime']
         if 'powerSequenceState' in bindings:
             self.property_powerSequenceState = bindings['powerSequenceState']
+
+        if 'contractualPLConsumptionMaxValue' in bindings:
+            self.el_data['contractualPLConsumptionMaxValue'] = bindings['contractualPLConsumptionMaxValue']
+            self.SetDataToDevice('powerLimit',int(float(bindings['contractualPLConsumptionMaxValue'])))
         
-        #self.StartSendingThread()
+    def SetDataToDevice(self,propertyId,value):
+        #response = requests.put(self.el_endpoint+'/elapi/v1/devices/' + self.el_id+'/properties/'+ propertyId + '/', 
+                                #"{\""+propertyId+"\":\""+value+"\"}")
+        response = requests.put(self.el_endpoint+'/elapi/v1/devices/' + self.el_id+'/properties/'+ propertyId + '/', 
+                                json={propertyId: value})
+        
+        print("\n\n\n\n",response.ok, response.text,"\n\n\n","{\""+propertyId+"\":\""+value+"\"}","\n\n",self.el_endpoint+'/elapi/v1/devices/' + self.el_id+'/properties/'+ propertyId + '/',"\n\n\n" )
+
     def GetData(self):
         sotangdan =1
         response = requests.get(self.el_endpoint+'/elapi/v1/devices/' + self.el_id+'/properties')
@@ -100,6 +116,9 @@ class EchonetLITEDevice:
         activeSlotNumber = 1
         sequenceRemoteControllable = "True"
 
+
+        if 'onTimerAbsolute' in data:
+            self.property_startTime = data['onTimerAbsolute']
         startTime=  self.property_startTime
         endTime = self.property_endTime
         earliestStartTime = self.property_earliestStartTime
@@ -153,7 +172,7 @@ class EchonetLITEDevice:
         value = 23
 
         data_MONITORING_POWER_CONSUMPTION = {
-            "esa": f"<https://example.org/power/{esa}>",
+            "esa": f"{esa}",
             "commodity": f"<https://example.org/commodity/{commodity}>",
             "monitoring_of_power_consumption": f"{monitoring_of_power_consumption}",
             "power": f"{power}",
@@ -165,33 +184,40 @@ class EchonetLITEDevice:
 
 
 
+        currentLimit = 0
+        powerlimitIsActive_value = "True"
+        if 'powerLimit' in data:
+            currentLimit = int(data['powerLimit'])
+            if currentLimit<=0: powerlimitIsActive_value = "False"
+
+        
         powerlimit = "powerlimit"
         powerLimitIdentifier= "powerLimitIdentifier"
-        powerLimitIsChangeable= "powerLimitIsChangeable"
-        powerLimitIsObligatory= "powerLimitIsObligatory"
+        powerLimitIsChangeable= "True"
+        powerLimitIsObligatory= "False"
         powerLimitDuration = "powerLimitDuration"
-        powerlimitIsActive = "powerlimitIsActive"
+        powerlimitIsActive = powerlimitIsActive_value
         powerLimitConsumptionMax = "powerLimitConsumptionMax"
         powerLimitConsumptionMaxUnit = "powerLimitConsumptionMaxUnit"
         powerLimitConsumptionMaxValue = "powerLimitConsumptionMaxValue"
         contractualPowerLimit = "contractualPowerLimit"
         contractualPLConsumptionMax= "contractualPLConsumptionMax"
         contractualPLConsumptionMaxUnit= "contractualPLConsumptionMaxUnit"
-        contractualPLConsumptionMaxValue= "contractualPLConsumptionMaxValue"
-        nominalPowerLimit= "nominalPowerLimit"
-        nominalPLConsumptionMax= "nominalPLConsumptionMax"
-        nominalPLConsumptionMaxUnit= "nominalPLConsumptionMaxUnit"
-        failSafeState = "failSafeState"
-        failsafeStateDuration= "failsafeStateDuration"
-        failsafeStateDurationIsChangeable = "failsafeStateDurationIsChangeable"
-        failsafePowerLimit= "failsafePowerLimit"
-        failsafePLConsumption = "failsafePLConsumption"
-        failsafePLConsumptionMax= "failsafePLConsumptionMax"
-        failsafePLConsumptionMaxUnit= "failsafePLConsumptionMaxUnit"
-        failsafePLConsumptionMaxValue= "failsafePLConsumptionMaxValue"
-        failsafePLConsumptionMaxIsChangeable= "failsafePLConsumptionMaxIsChangeable"
+        contractualPLConsumptionMaxValue= currentLimit
+        # nominalPowerLimit= "nominalPowerLimit"
+        # nominalPLConsumptionMax= "nominalPLConsumptionMax"
+        # nominalPLConsumptionMaxUnit= "nominalPLConsumptionMaxUnit"
+        # failSafeState = "failSafeState"
+        # failsafeStateDuration= "failsafeStateDuration"
+        # failsafeStateDurationIsChangeable = "failsafeStateDurationIsChangeable"
+        # failsafePowerLimit= "failsafePowerLimit"
+        # failsafePLConsumption = "failsafePLConsumption"
+        # failsafePLConsumptionMax= "failsafePLConsumptionMax"
+        # failsafePLConsumptionMaxUnit= "failsafePLConsumptionMaxUnit"
+        # failsafePLConsumptionMaxValue= "failsafePLConsumptionMaxValue"
+        # failsafePLConsumptionMaxIsChangeable= "failsafePLConsumptionMaxIsChangeable"
         data_LIMITATION_POWER_CONSUMPTION = {
-            "esa": f"<https://example.org/power/{esa}>",
+            "esa": f"{esa}",
             "powerlimit":f"{powerlimit}",
             "powerLimitIdentifier":f"{powerLimitIdentifier}",
             "powerLimitIsChangeable":f"{powerLimitIsChangeable}",
@@ -205,20 +231,24 @@ class EchonetLITEDevice:
             "contractualPLConsumptionMax":f"{contractualPLConsumptionMax}",
             "contractualPLConsumptionMaxUnit":f"{contractualPLConsumptionMaxUnit}",
             "contractualPLConsumptionMaxValue":f"{contractualPLConsumptionMaxValue}",
-            "nominalPowerLimit":f"{nominalPowerLimit}",
-            "nominalPLConsumptionMax":f"{nominalPLConsumptionMax}",
-            "nominalPLConsumptionMaxUnit":f"{nominalPLConsumptionMaxUnit}",
-            "failSafeState":f"{failSafeState}",
-            "failsafeStateDuration":f"{failsafeStateDuration}",
-            "failsafeStateDurationIsChangeable":f"{failsafeStateDurationIsChangeable}",
-            "enfailsafePowerLimitdTime":f"{failsafePowerLimit}",
-            "failsafePLConsumption":f"{failsafePLConsumption}",
-            "failsafePLConsumptionMax":f"{failsafePLConsumptionMax}",
-            "failsafePLConsumptionMaxUnit":f"{failsafePLConsumptionMaxUnit}",
-            "failsafePLConsumptionMaxValue":f"{failsafePLConsumptionMaxValue}",
-            "failsafePLConsumptionMaxIsChangeable":f"{failsafePLConsumptionMaxIsChangeable}",
+            # "nominalPowerLimit":f"{nominalPowerLimit}",
+            # "nominalPLConsumptionMax":f"{nominalPLConsumptionMax}",
+            # "nominalPLConsumptionMaxUnit":f"{nominalPLConsumptionMaxUnit}",
+            # "failSafeState":f"{failSafeState}",
+            # "failsafeStateDuration":f"{failsafeStateDuration}",
+            # "failsafeStateDurationIsChangeable":f"{failsafeStateDurationIsChangeable}",
+            # "enfailsafePowerLimitdTime":f"{failsafePowerLimit}",
+            # "failsafePLConsumption":f"{failsafePLConsumption}",
+            # "failsafePLConsumptionMax":f"{failsafePLConsumptionMax}",
+            # "failsafePLConsumptionMaxUnit":f"{failsafePLConsumptionMaxUnit}",
+            # "failsafePLConsumptionMaxValue":f"{failsafePLConsumptionMaxValue}",
+            # "failsafePLConsumptionMaxIsChangeable":f"{failsafePLConsumptionMaxIsChangeable}",
         }
         self.structureData[EnergyUseCaseType.LIMITATION_POWER_CONSUMPTION] = data_LIMITATION_POWER_CONSUMPTION
+
+
+
+
 
 
         incentiveBasedProfile="incentiveBasedProfile"

@@ -298,10 +298,10 @@ class EnergyUseCase:
 
 
     def handle_react_measurements(self,bindings,requestingKnowledgeBaseId):
-        now = datetime.now()
+        #now = datetime.now()
         for binding in bindings:
             self.present_measurement(binding,requestingKnowledgeBaseId)
-        print("end receving: ", (datetime.now() - now).seconds,"seconds")
+        #print("end receving: ", (datetime.now() - now).seconds,"seconds")
         return []
     def my_react_loop(self):
         #time.sleep(1)

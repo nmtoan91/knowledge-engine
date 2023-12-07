@@ -8,7 +8,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 from enum import Enum
 from KnowledgeEngineManager import EnergyUseCaseType
-
+from datetime import datetime
 class DeviceType(Enum):
     UNKNOWN =0
     TEMPERATURE_SENSOR =1
@@ -25,7 +25,7 @@ class DeviceView(tk.Frame):
         self.property_valueSource  = "N/A"
         self.property_powerSequenceState  = "N/A"
         self.property_powerSequenceSlotPowerType  = "N/A"
-
+        self.property_contractualPLConsumptionMaxValue = 0
         self.prefix = "http://"
         self.manager = manager
         self.deviceType = deviceType
@@ -84,6 +84,7 @@ class DeviceView(tk.Frame):
 
         self.scale = tk.Scale(frame_scale, from_=0, to=100, orient=tk.HORIZONTAL,length=200)
         self.scale.pack(side=tk.LEFT)
+        self.scale_lastime_modify = datetime(1111,1,1,1,11,11)
         self.scale.bind("<ButtonRelease-1>", self.updateScaleValue)
     def CreateFlexibleStartUI(self,frame):
 
@@ -181,7 +182,13 @@ class DeviceView(tk.Frame):
             if 'powerSequenceSlotPowerType' in data:
                 self.property_powerSequenceSlotPowerType = data['powerSequenceSlotPowerType']
                 self.label_flexible_powerSequenceSlotPowerType.config(text=self.property_powerSequenceSlotPowerType)
-                
+        elif energyUseCaseType== EnergyUseCaseType.LIMITATION_POWER_CONSUMPTION:
+            if 'contractualPLConsumptionMaxValue' in data and ( (datetime.now() - self.scale_lastime_modify).total_seconds() > 5):
+                self.property_contractualPLConsumptionMaxValue = int(data['contractualPLConsumptionMaxValue'])*100/65535
+                self.scale.set(self.property_contractualPLConsumptionMaxValue)
+                #print("\n\n\n\n",self.property_contractualPLConsumptionMaxValue,"\n\n\n")
+            
+
 
         else: print("Error here")
 
@@ -195,10 +202,12 @@ class DeviceView(tk.Frame):
 
     def ReceiveData_WashingMachine(self, data,requestingKnowledgeBaseId):
         self.datasample_count +=1
-        self.data_x.append(self.datasample_count)
-        self.data_y.append(float(data['powerSequenceSlotValue']))
 
-        print("Getting washingmachine data len=", len(self.data_x))
+        if 'powerSequenceSlotValue' in data:
+            self.data_x.append(self.datasample_count)
+            self.data_y.append(float(data['powerSequenceSlotValue']))
+
+        #print("Getting washingmachine data len=", len(self.data_x))
         if len(self.data_y) > 50: self.data_x.pop(0);self.data_y.pop(0)
 
         self.UpdateUI_Chart()
@@ -210,7 +219,9 @@ class DeviceView(tk.Frame):
         self.scatter.draw()
 
     def updateScaleValue(self, event):
-        print("scale value: " + str(self.scale.get()))
+        print("on scale value changed " + str(self.scale.get()) + "\n\n\n")
+        self.scale_lastime_modify = datetime.now()
+
     def flexible_stop_click(self):
         self.isFlexible_stop = not self.isFlexible_stop
         if self.isFlexible_stop:
@@ -221,6 +232,8 @@ class DeviceView(tk.Frame):
     def flexible_apply_click(self):
         data_earliestStartTime = self.text_flexible_earliestStartTime.get("1.0","end").replace('\n','')
         data_latestEndTime = self.text_flexible_latestEndTime.get("1.0","end").replace('\n','')
+        data_startTime = self.text_flexible_startTime.get("1.0","end").replace('\n','')
+        data_endTime = self.text_flexible_endTime.get("1.0","end").replace('\n','')
         print(data_earliestStartTime, data_latestEndTime)
 
         self.manager.Ask(EnergyUseCaseType.FLEXIBLE_START, 
@@ -233,12 +246,21 @@ class DeviceView(tk.Frame):
             #"latestEndTime": self.prefix + data_latestEndTime,
             "earliestStartTime":  data_earliestStartTime,
             "latestEndTime": data_latestEndTime,
+            "startTime":  data_startTime,
+            "endTime": data_endTime,
         } )
         self.text_flexible_earliestStartTime.delete(1.0, "end")
         self.text_flexible_latestEndTime.delete(1.0, "end")
         self.text_flexible_startTime.delete(1.0, "end")
         self.text_flexible_endTime.delete(1.0, "end")
         
+
+        self.scale_lastime_modify = datetime(1111,1,1,1,11,11)
+        self.manager.Ask(EnergyUseCaseType.LIMITATION_POWER_CONSUMPTION,
+                          {
+                              "esa": self.data['esa'],
+                            'contractualPLConsumptionMaxValue' : self.scale.get()*65536/100
+                          })
 
     def flexible_pause_click(self):
         self.isFlexible_pause = not self.isFlexible_pause
