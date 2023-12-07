@@ -101,7 +101,10 @@ class EchonetLITEDevice:
 
     def GetData(self):
         sotangdan =1
+        print('getting data')
         response = requests.get(self.el_endpoint+'/elapi/v1/devices/' + self.el_id+'/properties')
+        print(response.ok) 
+
         self.el_data =data = json.loads(response.text)
         onTimerReservationStatus = 'enable'
         if 'onTimerReservationStatus' in self.el_data:
