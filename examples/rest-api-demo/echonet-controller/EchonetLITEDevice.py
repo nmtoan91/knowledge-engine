@@ -106,9 +106,9 @@ class EchonetLITEDevice:
         print(response.ok) 
 
         self.el_data =data = json.loads(response.text)
-        onTimerReservationStatus = 'enable'
-        if 'onTimerReservationStatus' in self.el_data:
-            onTimerReservationStatus = self.el_data['onTimerReservationStatus']
+        remoteControl = 'enable'
+        if 'remoteControl' in self.el_data:
+            remoteControl = self.el_data['remoteControl']
             
         prefix = "http://jaist.ac.com/"
         esa = self.kb_id#prefix+"esa"+self.el_id
@@ -150,7 +150,7 @@ class EchonetLITEDevice:
             "commodityProperty": f"{commodityProperty}",
             "power": f"{power}",
             "powerProfile": f"{powerProfile}",
-            "nodeRemoteControllable": f"{onTimerReservationStatus}",
+            "nodeRemoteControllable": f"{remoteControl}",
             "supportsReselection": f"{supportsReselection}",
             "alternativesgroup": f"{alternativesgroup}",
             "alternativesID": f"{alternativesID}",

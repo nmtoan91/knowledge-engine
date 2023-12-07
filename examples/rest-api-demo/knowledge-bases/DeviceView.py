@@ -201,7 +201,7 @@ class DeviceView(tk.Frame):
                 isChange = (self.property_nodeRemoteControllable!= data['nodeRemoteControllable'])
                 self.property_nodeRemoteControllable = data['nodeRemoteControllable']
                 #print("\n\n\n\n\n\n\n","property_nodeRemoteControllable","\n",self.property_nodeRemoteControllable,"\n",isChange,"\n\n\n\n\n")
-                isChange = True
+                #isChange = True
                 if isChange:
                     self.UpdateManualOperationUI()
             else: print("\n\n\n\n\n [ERROR MANUAL_OPERATION] \n\n\n")
@@ -309,7 +309,7 @@ class DeviceView(tk.Frame):
 
     def UpdateManualOperationUI(self):
         
-        if self.property_nodeRemoteControllable == 'disable':
+        if self.property_nodeRemoteControllable == 'false' or self.property_nodeRemoteControllable == 'False' :
             self.text_flexible_startTime.configure(state='disabled')
             self.text_flexible_endTime.configure(state='disabled')
             self.text_flexible_latestEndTime.configure(state='disabled')
@@ -320,7 +320,7 @@ class DeviceView(tk.Frame):
             #self.button_operation.config(text="Operation: ON", fg="green")
             #self.label_flexible_powerSequenceState.config(text=self.property_powerSequenceState)
             
-        elif self.property_nodeRemoteControllable == 'enable':
+        elif self.property_nodeRemoteControllable == 'true' or self.property_nodeRemoteControllable == 'True':
             asd=123
             self.text_flexible_startTime.configure(state='normal')
             self.text_flexible_endTime.configure(state='normal')
@@ -330,6 +330,7 @@ class DeviceView(tk.Frame):
             self.button_flexible_apply['state'] = 'normal'
             self.label_operation.config(text="DISABLE")
             #self.button_operation.config(text="Operation: OFF", fg="black")
+        else: print("\n\n", self.property_nodeRemoteControllable ,"\n\n")
             
 
 
