@@ -87,14 +87,17 @@ class EchonetLITEDevice:
         if 'contractualPLConsumptionMaxValue' in bindings:
             self.el_data['contractualPLConsumptionMaxValue'] = bindings['contractualPLConsumptionMaxValue']
             self.SetDataToDevice('powerLimit',int(float(bindings['contractualPLConsumptionMaxValue'])))
-        
-    def SetDataToDevice(self,propertyId,value):
+
+    def SetDataToDevice(self,propertyId,value):    
+        x = threading.Thread(target=self.SetDataToDevice_, args=(propertyId,value))
+        x.start()
+    def SetDataToDevice_(self,propertyId,value):
         #response = requests.put(self.el_endpoint+'/elapi/v1/devices/' + self.el_id+'/properties/'+ propertyId + '/', 
                                 #"{\""+propertyId+"\":\""+value+"\"}")
         response = requests.put(self.el_endpoint+'/elapi/v1/devices/' + self.el_id+'/properties/'+ propertyId + '/', 
                                 json={propertyId: value})
         
-        print("\n\n\n\n",response.ok, response.text,"\n\n\n","{\""+propertyId+"\":\""+value+"\"}","\n\n",self.el_endpoint+'/elapi/v1/devices/' + self.el_id+'/properties/'+ propertyId + '/',"\n\n\n" )
+        print("\n\n\n\n",response.ok, response.text,"\n\n\n" )
 
     def GetData(self):
         sotangdan =1
