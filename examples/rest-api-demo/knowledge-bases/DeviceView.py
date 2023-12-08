@@ -11,11 +11,26 @@ from KnowledgeEngineManager import EnergyUseCaseType
 from datetime import datetime
 class DeviceType(Enum):
     UNKNOWN =0
-    TEMPERATURE_SENSOR =1
-    WASHING_MACHINE = 2
+    #TEMPERATURE_SENSOR =1
+    #WASHING_MACHINE = 2
+    HYBRID_WATER_HEATER = 3
+    BATHROOM_HEATER_DRYER = 4
+    VENTILATION_FAN = 5
+    AIRCONDITIONER_VENTILATION_FAN = 6
+    ELECTRIC_WATER_HEATER = 7
+    WASHER_DRYER = 8
+    INSTANTANEOUS_WATER_HEATER = 9
     def GetDeviceType(data):
-        if 'esa' in data: return DeviceType.WASHING_MACHINE
-        if 'sensor' in data: return DeviceType.TEMPERATURE_SENSOR
+        if data['esa'].find('hybridWaterHeater') >=0: return DeviceType.HYBRID_WATER_HEATER
+        if data['esa'].find('bathroomHeaterDryer') >=0: return DeviceType.BATHROOM_HEATER_DRYER
+        if data['esa'].find('ventilationFan') >=0: return DeviceType.VENTILATION_FAN
+        if data['esa'].find('airConditionerVentilationFan') >=0: return DeviceType.AIRCONDITIONER_VENTILATION_FAN
+        if data['esa'].find('electricWaterHeater') >=0: return DeviceType.ELECTRIC_WATER_HEATER
+        if data['esa'].find('washerDryer') >=0: return DeviceType.WASHER_DRYER
+        if data['esa'].find('instantaneousWaterHeater') >=0: return DeviceType.INSTANTANEOUS_WATER_HEATER
+        
+        #if 'esa' in data: return DeviceType.WASHING_MACHINE
+        #if 'sensor' in data: return DeviceType.TEMPERATURE_SENSOR
         return DeviceType.UNKNOWN
 
 class DeviceView(tk.Frame):
@@ -30,10 +45,15 @@ class DeviceView(tk.Frame):
         self.prefix = "http://"
         self.manager = manager
         self.deviceType = deviceType
-        if deviceType == DeviceType.WASHING_MACHINE:
-            iconname = "cleaning.png"
-        elif deviceType == DeviceType.TEMPERATURE_SENSOR:
-            iconname = "temperature.png"
+        iconname = "cleaning.png"
+        if deviceType ==  DeviceType.HYBRID_WATER_HEATER: iconname = "water_heaters.png"
+        elif deviceType ==  DeviceType.BATHROOM_HEATER_DRYER: iconname = "heat_pumps.png"
+        elif deviceType ==  DeviceType.VENTILATION_FAN: iconname = "ventilation.png"
+        elif deviceType ==  DeviceType.AIRCONDITIONER_VENTILATION_FAN: iconname = "ventilation.png"
+        elif deviceType ==  DeviceType.ELECTRIC_WATER_HEATER: iconname = "local_space_heaters.png"
+        elif deviceType ==  DeviceType.WASHER_DRYER: iconname = "washer_driers.png"
+        elif deviceType ==  DeviceType.INSTANTANEOUS_WATER_HEATER: iconname = "water_heaters.png"
+
 
         self.datasample_count =0
         self.id = id
@@ -53,7 +73,11 @@ class DeviceView(tk.Frame):
         my_label.img = my_img  
         my_label.grid( row=0,column=0, sticky=tk.N)
 
-        self.label_device_id =tk.Label(frame,text=id,bg='lavender')
+        text_id = id
+        for i in range(31,len(text_id),32):
+            text_id = text_id[0:i] + '\n' + text_id[i:-1]
+
+        self.label_device_id =tk.Label(frame,text=text_id,bg='lavender')
         self.label_device_id.grid( row=1,column=0, sticky=tk.N)
 
 
@@ -166,10 +190,7 @@ class DeviceView(tk.Frame):
         
     def ReceiveData(self,data,requestingKnowledgeBaseId,energyUseCaseType):
         self.data = data
-        if self.deviceType == DeviceType.TEMPERATURE_SENSOR:
-            self.ReceiveData_Sensor(data,requestingKnowledgeBaseId)
-        elif self.deviceType == DeviceType.WASHING_MACHINE:
-            self.ReceiveData_WashingMachine(data,requestingKnowledgeBaseId)
+        self.ReceiveData_Universal(data,requestingKnowledgeBaseId)
 
         if energyUseCaseType== EnergyUseCaseType.FLEXIBLE_START_MANUAL_OPERATION:
             if 'earliestStartTime' in data and self.text_flexible_earliestStartTime.get("1.0","end") =='\n':
@@ -224,7 +245,7 @@ class DeviceView(tk.Frame):
 
         self.UpdateUI_Chart()
 
-    def ReceiveData_WashingMachine(self, data,requestingKnowledgeBaseId):
+    def ReceiveData_Universal(self, data,requestingKnowledgeBaseId):
         self.datasample_count +=1
 
         if 'powerSequenceSlotValue' in data:

@@ -18,7 +18,7 @@ class MainView(threading.Thread):
         self.root = tk.Tk()
         self.root.geometry("600x800")
         self.root.title('Demonstation')
-        self.root.geometry('{}x{}'.format(1000, 750))
+        self.root.geometry('{}x{}'.format(1300, 1500))
 
         self.root.columnconfigure(0, weight=1)
         self.root.columnconfigure(1, weight=1)
@@ -47,7 +47,7 @@ class MainView(threading.Thread):
     def AddDevice(self, deviceId, deviceType:DeviceType):
         frame  = DeviceView(self.root,deviceId,deviceType,self.manager)
         index = len(self.devices)
-        frame.frame.grid(row=index//3, column =index%3)
+        frame.frame.grid(row=index//4, column =index%4)
         self.devices[frame.id] = frame
     
 if __name__ == "__main__":

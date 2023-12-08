@@ -298,7 +298,7 @@ class EchonetLITEDeviceManager:
             desc = deviceInfo['manufacturer']['descriptions']['en']
             if key not in self.devices:
                 #if key != 'washerDryer-1701394427.760471': continue #test only
-                if key != 'washerDryer-103188638647835413907134999069967199908': continue #test only
+                #if key != 'washerDryer-103188638647835413907134999069967199908': continue #test only
                 
                 deviceType = deviceInfo['deviceType']
                 device = EchonetLITEDevice(EchonetLITEDeviceType(deviceType),
@@ -308,7 +308,7 @@ class EchonetLITEDeviceManager:
                                     self.ke_endpoint ,self.el_endpoint, key ,self    )
                 self.devices[device.kb_id] = device
                 print(f"\n\n\n\n Adding device: {device.kb_id}\n\n\n\n")
-                break #test only
+                #break #test only
 
         if len(self.devices) ==0: print('ERROR: Device not found on echonetLITE server; original len=',len(data['devices']))
             
