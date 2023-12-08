@@ -226,7 +226,7 @@ def start_handle_loop(handlers: dict[str, callable], kb_id: str, ke_endpoint: st
         response = requests.get(
             ke_endpoint + "sc/handle", headers={"Knowledge-Base-Id": kb_id}
         )
-        print('check get calltime: ',(datetime.now() - now).seconds,"seconds" )
+        print('check get calltime: ',(datetime.now() - now).seconds,"seconds; OK=",response.ok  )
 
         if response.status_code == 200:
             # 200 means: we receive bindings that we need to handle, then repoll asap.
