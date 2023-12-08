@@ -302,7 +302,7 @@ class EchonetLITEDeviceManager:
                 
                 deviceType = deviceInfo['deviceType']
                 device = EchonetLITEDevice(EchonetLITEDeviceType(deviceType),
-                                "http://jaist.org/device_"+ key+ str(random.randint(0,10000)),
+                                "http://jaist.org/"+ key+ str(random.randint(0,10000)),
                                 deviceType+":"+key,
                                 desc,
                                     self.ke_endpoint ,self.el_endpoint, key ,self    )

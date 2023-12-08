@@ -9,6 +9,7 @@ import numpy as np
 from enum import Enum
 from KnowledgeEngineManager import EnergyUseCaseType
 from datetime import datetime
+import random
 class DeviceType(Enum):
     UNKNOWN =0
     #TEMPERATURE_SENSOR =1
@@ -37,6 +38,7 @@ class DeviceView(tk.Frame):
     
 
     def __init__(self,root, id, deviceType: DeviceType,manager):
+        self.random_fake_trend = 1
         self.property_valueSource  = "N/A"
         self.property_powerSequenceState  = "N/A"
         self.property_powerSequenceSlotPowerType  = "N/A"
@@ -63,19 +65,26 @@ class DeviceView(tk.Frame):
         self.data_x = []
         self.data_y = []
 
-        frame = tk.Frame(root, bg='lavender', width=300, height=600, pady=10,padx = 10)
+        frame = tk.Frame(root, bg='lavender', width=500, height=600, pady=10,padx = 10)
         #frame = tk.Frame(root, bg='brown', width=300, height=600, pady=10,padx = 10)
-        frame.grid_rowconfigure(1, weight=1)
+        frame.grid_rowconfigure(0, weight=1)
         frame.grid_columnconfigure(0, weight=1)
+       
+  
+        frame_icon = tk.Frame(frame, width=100,background='lavender', height=100, pady=10,padx = 20)
+        frame_icon.grid( row=0,column=0,sticky="NESW")#sticky=tk.E)
+
         image = Image.open(r"examples/rest-api-demo/knowledge-bases/Images/"+iconname).resize((100, 100))
         my_img = ImageTk.PhotoImage(image)
-        my_label = tk.Label(frame,image=my_img,bg='lavender')  
-        my_label.img = my_img  
-        my_label.grid( row=0,column=0, sticky=tk.N)
+        my_label = tk.Label(frame_icon,image=my_img,bg='lavender')  
+        my_label.img = my_img 
+        my_label.pack()
+        #my_label.grid( row=0,column=0)
 
-        text_id = id
-        for i in range(31,len(text_id),32):
-            text_id = text_id[0:i] + '\n' + text_id[i:-1]
+        text_id = id.replace("http://jaist.org/",'')
+        text_id = text_id[0:32]
+        #for i in range(31,len(text_id),32):
+        #    text_id = text_id[0:i] + '\n' + text_id[i:-1]
 
         self.label_device_id =tk.Label(frame,text=text_id,bg='lavender')
         self.label_device_id.grid( row=1,column=0, sticky=tk.N)
@@ -85,7 +94,7 @@ class DeviceView(tk.Frame):
         frame_buttons2.grid( row=2,column=0, sticky=tk.N)
 
         label = tk.Label(frame_buttons2,text="Manual\nOperation",bg='lavender')
-        label.pack(side=tk.LEFT)
+        label.pack(side=tk.RIGHT)
 
         self.label_operation = tk.Label(frame_buttons2,text="OFF",bg='lavender')
         self.label_operation.pack(side=tk.RIGHT)
@@ -112,7 +121,7 @@ class DeviceView(tk.Frame):
         self.scatter.get_tk_widget().grid( row=6,column=0, sticky=tk.S)
 
         frame_scale = tk.Frame(frame,background='lavender', width=100, height=100, pady=10,padx = 20)
-        frame_scale.grid( row=10,column=0, sticky=tk.N)
+        frame_scale.grid( row=10,column=0, sticky="NESW")#sticky=tk.N)
 
         scalelabel = tk.Label(frame_scale,text="Limit\nPower",bg='lavender')
         scalelabel.pack(side=tk.LEFT)
@@ -179,18 +188,18 @@ class DeviceView(tk.Frame):
         self.label_flexible_valueSource = tk.Label(frame_flexible,text="valueSource: " + self.property_valueSource,bg='lavender')
         self.label_flexible_valueSource.grid( row=5,column=0, sticky=tk.W)
 
-        self.label_flexible_powerSequenceState = tk.Label(frame_flexible,text="powerSequenceState: " + self.property_powerSequenceState,bg='lavender')
+        self.label_flexible_powerSequenceState = tk.Label(frame_flexible,text="powerState: " + self.property_powerSequenceState,bg='lavender')
         self.label_flexible_powerSequenceState.grid( row=5,column=1, sticky=tk.W)
 
-        self.label_flexible_powerSequenceSlotPowerType = tk.Label(frame_flexible,text="powerSequenceSlotPowerType: "+ self.property_powerSequenceSlotPowerType,bg='lavender')
+        self.label_flexible_powerSequenceSlotPowerType = tk.Label(frame_flexible,text="powerSlotPowerType: "+ self.property_powerSequenceSlotPowerType,bg='lavender')
         self.label_flexible_powerSequenceSlotPowerType.grid( row=6,column=1, sticky=tk.W)
 
         
 
         
     def ReceiveData(self,data,requestingKnowledgeBaseId,energyUseCaseType):
-        self.data = data
         self.ReceiveData_Universal(data,requestingKnowledgeBaseId)
+        self.data = data
 
         if energyUseCaseType== EnergyUseCaseType.FLEXIBLE_START_MANUAL_OPERATION:
             if 'earliestStartTime' in data and self.text_flexible_earliestStartTime.get("1.0","end") =='\n':
@@ -216,7 +225,7 @@ class DeviceView(tk.Frame):
                 self.label_flexible_valueSource.config(text='valueSource:\n'+self.property_valueSource.replace('s4ener:',''))
             if 'powerSequenceSlotPowerType' in data:
                 self.property_powerSequenceSlotPowerType = data['powerSequenceSlotPowerType']
-                self.label_flexible_powerSequenceSlotPowerType.config(text='powerSequenceSlotPowerType:\n'+self.property_powerSequenceSlotPowerType.replace('s4ener:',''))
+                self.label_flexible_powerSequenceSlotPowerType.config(text='powerSlotPowerType:\n'+self.property_powerSequenceSlotPowerType.replace('s4ener:',''))
             if 'nodeRemoteControllable' in data:
                 isChange = False
                 isChange = (self.property_nodeRemoteControllable!= data['nodeRemoteControllable'])
@@ -245,12 +254,18 @@ class DeviceView(tk.Frame):
 
         self.UpdateUI_Chart()
 
+    
     def ReceiveData_Universal(self, data,requestingKnowledgeBaseId):
         self.datasample_count +=1
 
         if 'powerSequenceSlotValue' in data:
+            if random.randint(0,5) ==0:
+                self.random_fake_trend = -self.random_fake_trend
+
+            print(data['powerSequenceSlotValue'])
             self.data_x.append(self.datasample_count)
-            self.data_y.append(float(data['powerSequenceSlotValue']))
+            val = float(data['powerSequenceSlotValue'])/1000
+            self.data_y.append(  val    + val*0.05*self.random_fake_trend*random.random()  )
 
         #print("Getting washingmachine data len=", len(self.data_x))
         if len(self.data_y) > 50: self.data_x.pop(0);self.data_y.pop(0)
@@ -331,10 +346,10 @@ class DeviceView(tk.Frame):
     def UpdateManualOperationUI(self):
         
         if self.property_nodeRemoteControllable == 'false' or self.property_nodeRemoteControllable == 'False' :
-            self.text_flexible_startTime.configure(state='disabled')
-            self.text_flexible_endTime.configure(state='disabled')
-            self.text_flexible_latestEndTime.configure(state='disabled')
-            self.text_flexible_earliestStartTime.configure(state='disabled')
+            self.text_flexible_startTime.configure(state='disabled',bg='gray70')
+            self.text_flexible_endTime.configure(state='disabled',bg='gray70')
+            self.text_flexible_latestEndTime.configure(state='disabled',bg='gray70')
+            self.text_flexible_earliestStartTime.configure(state='disabled',bg='gray70')
             self.button_flexible_stop['state'] = 'disabled'
             self.button_flexible_apply['state'] = 'disabled'
             self.label_operation.config(text="ENABLE")
